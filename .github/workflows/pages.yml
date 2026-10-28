@@ -26,6 +26,9 @@ concurrency:
 
 jobs:
   deploy:
+    # The hackathon copy (clips-kitty-nebius-basketball) must never publish the
+    # app's image, website, mirror or stats: only the original repository does.
+    if: github.repository == 'ColinGPT9/clips-studio'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

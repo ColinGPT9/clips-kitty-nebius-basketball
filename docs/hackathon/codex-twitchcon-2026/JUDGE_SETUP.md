@@ -51,5 +51,5 @@ The actual host processed a continuous eight-minute excerpt of the same Twitch
 broadcast used by the live check, then exported a19.2-second vertical clip with
 manual facecam framing. This is not a claim that live nominations generated the
 highlight or that chat/VOD timing was verified. Gameplay and personal account
-data are not included in these source archives. See docs/hackathon/TEST_LOG.md for the separate
+data are not included in these source archives. See docs/hackathon/codex-twitchcon-2026/TEST_LOG.md for the separate
 real-service, real-media, synthetic and offline results.

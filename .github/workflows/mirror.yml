@@ -26,6 +26,9 @@ jobs:
   # ---------------------------------------------------------------- website
   huggingface-space:
     name: Website → Hugging Face Space
+    # The hackathon copy (clips-kitty-nebius-basketball) must never publish the
+    # app's image, website, mirror or stats: only the original repository does.
+    if: github.repository == 'ColinGPT9/clips-studio'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
