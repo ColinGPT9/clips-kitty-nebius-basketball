@@ -106,14 +106,16 @@ backend. Gemma and Nemotron see identical evidence.
 
 ## Accomplishments that we're proud of
 
-- The whole Basketball pipeline runs on Nemotron through Nebius with no change
+- The whole Basketball pipeline can run on Nemotron through Nebius with no change
   to its computer vision, transcription, rendering or publishing.
-- Adding Nebius took one provider file. The settings card, model picker,
-  connection test and job runner already handled it.
+- Adding Nebius took one provider file. The existing settings card, model picker,
+  connection test and job runner pick it up from the provider list. The only UI
+  change lets a provider word its own preferred model.
 - A benchmark that holds everything but the model constant, and reports what
   each model did worse as well as better.
-- 22 new offline tests cover every documented Nebius error body, rate-limit
-  waits, thinking inline or apart, and usage.
+- 25 new offline tests cover every documented Nebius error body, rate-limit
+  waits, thinking inline or apart, answers that only quote the closing tag, and
+  usage.
 
 ## What we learned
 
@@ -144,7 +146,8 @@ Since then:
   NVIDIA Nemotron, reasoning-output handling and token-usage reporting, the
   frozen-evidence benchmark, and the documentation.
 
-330 of the repository's 753 commits were made inside the submission period. The
+331 of the 752 commits up to `34f0c23`, where this edition starts, were made
+inside the submission period. The
 git history is public and dated. Every change in this edition is listed in
 [NEBIUS_CHANGES.md](NEBIUS_CHANGES.md). Nothing was trained or fine-tuned, and
 existing components (YOLO, OpenCV, E-BARD, Whisper, FFmpeg, WoopSocial) are

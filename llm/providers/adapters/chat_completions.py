@@ -147,8 +147,14 @@ _THOUGHT = re.compile(r"^\s*<think>.*?</think>\s*", re.S)
 
 def _without_thinking(text: str) -> str:
     text = _THOUGHT.sub("", text, count=1)
-    if "</think>" in text:
-        text = text.rsplit("</think>", 1)[1]
+    if "</think>" in text and not text.lstrip().startswith(("{", "[")):
+        # Thinking whose opening tag the model's template already sent, so
+        # only "</think>" arrives, then the JSON. Anything else keeps its
+        # "</think>": an answer that starts as JSON, where it is quoted text (a
+        # hook, a chat line), or a reply in words that mentions the tag.
+        tail = text.partition("</think>")[2]
+        if tail.lstrip().startswith(("{", "[", "```")):
+            text = tail
     if text.lstrip().startswith("<think>"):
         return ""  # still thinking when it stopped: no answer, which _text says
     return text

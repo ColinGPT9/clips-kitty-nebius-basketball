@@ -21,8 +21,11 @@ five seconds left. Belmont then fails to get a shot off from a three-second
 inbound, and the crowd storms the court.
 
 This is a hard case for Basketball mode. There is no score bug, so there are no
-confirmed baskets from OCR. Only one camera is used, so there are no broadcast
-cutaways. All the plays come from the commentary, the crowd and the picture.
+confirmed baskets from OCR, and the score-bug title check and window refinement
+don't apply. Only one camera is used, so there are no real broadcast cutaways.
+The cutaway finder still flagged 7 shots, most likely when the handheld camera
+swung to the crowd or the bench, and both models are given them. The plays come
+from the commentary, the crowd and the picture.
 
 ### Holding everything but the language model constant
 
@@ -44,8 +47,10 @@ The saved file is `local_1144e6ee30c4.pkl`, 0.3 MB.
 1. `find_clips`: the language model scores each commentary chunk and the
    moment and signal windows, the basketball moments are built, scores are
    fused and the plays selected, and the language model reranks the finalists.
-2. The basketball window refinement. This is YOLO plus OCR of the clock, and it
-   is deterministic for a given window.
+2. The basketball window refinement. On broadcast footage this runs YOLO and
+   OCR of the clock again on the clip windows, which is deterministic for a given
+   window. On this game it does nothing, because there is no score bug
+   (`BasketballProfile.refine_windows` skips club and phone footage).
 3. Titles and descriptions, then the basketball title check.
 
 All three use the app's own code, unchanged. Every language-model call goes
@@ -57,8 +62,9 @@ through a meter that records:
   app's own parsers find it);
 - the tokens the provider reported.
 
-Whisper, PANNs, OCR, YOLO, OpenCV and E-BARD are **not** run again. The same
-source, transcript and detections go to every backend. Rendering (FFmpeg,
+Whisper, PANNs and E-BARD are **not** run again, nor is the read of the game
+(score bug, shots, cutaways). The same source, transcript and detections go to
+every backend. Rendering (FFmpeg,
 E-BARD framing) comes after the language model's last decision and doesn't
 change what was picked, so it is left out of the timings.
 
@@ -72,6 +78,10 @@ a JSON object and then plain text. Ollama is asked for `format: json` with a
 1,024-token answer limit. That has always been true of local and cloud models in
 Clips Kitty (`llm/base.generate_json`). The third run below, Gemma on Nebius,
 separates the model from the way it is served.
+
+Neither side looks at the picture. Basketball relabels reaction shots only with
+a local model that can see images, and `gemma:7b` can't, so the vision step is
+skipped for every run here.
 
 ### The runs
 
@@ -162,6 +172,6 @@ NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend neb
 python scripts/hackathon/llm_bench.py compare bench/runs/gemma.json bench/runs/nemotron.json bench/runs/gemma-nebius.json
 ```
 
-The frozen inputs and every run's JSON (each call's step, time, JSON check, usage
-and the first 400 characters of its answer) are kept in
-`docs/hackathon/bench/`, so the tables can be checked.
+The frozen inputs and every run's JSON (each call's step, time, JSON check, usage,
+the first 400 characters of its answer, and where each final title came from)
+go in `docs/hackathon/bench/` as each run finishes, so the tables can be checked.

@@ -177,9 +177,12 @@ def test_only_models_that_answer_in_text_are_offered_with_their_price(env):
     assert [line["label"] for line in lightning["pricing"]] == ["Input", "Cached input", "Output"]
 
 
-def test_the_preferred_model_is_a_nemotron_the_live_list_has(env):
+def test_the_preferred_nemotron_survives_the_filter_and_says_why_it_is_preferred(env):
+    # Whether today's Nebius list still has it is checked live, by
+    # scripts/hackathon/nebius_check.py; here, that the filter keeps it.
     preferred = PROVIDERS["nebius"].preferred
-    assert preferred["text"].startswith("nvidia/") and preferred["text_family"] == "nvidia/"
+    assert preferred["text"] == "nvidia/Nemotron-3_5-Lightning" and preferred["text_family"] == "nvidia/"
+    assert "Nemotron" in preferred["text_why"] and preferred["text_family_label"] == "NVIDIA Nemotron"
     env.save_key()
     ids = [m["id"] for m in env.client.get("/ai/providers/nebius/models").json()["models"]]
     assert preferred["text"] in ids
@@ -234,6 +237,23 @@ def test_thinking_written_into_the_answer_is_left_out(env, content):
     raw = env.backend().generate("pick clips", json_mode=True, schema=CLIPS_SCHEMA)
     assert raw == CLIPS
     assert len(_parse_clips_json(raw)) == 1
+
+
+@pytest.mark.parametrize("content", [
+    '{"clips": [{"start": 1, "end": 20, "score": 80, "hook": "chat spams </think> lol", "reason": "r"}]}',
+    'In this model\'s output, </think> closes the thinking.',
+])
+def test_an_answer_that_only_mentions_the_closing_tag_is_kept_whole(env, content):
+    env.save_key()
+    env.replies = [Response(200, answer(content))]
+    assert env.backend().generate("pick clips") == content
+
+
+def test_usage_a_provider_reports_oddly_never_fails_the_answer(env):
+    env.save_key()
+    env.replies = [Response(200, answer(CLIPS, usage_row={"prompt_tokens": float("inf"), "completion_tokens": None}))]
+    assert env.backend().generate("pick clips") == CLIPS
+    assert usage.totals()[f"nebius/{NEMOTRON}"]["prompt_tokens"] == 0
 
 
 def test_thinking_sent_apart_is_never_read(env):

@@ -102,5 +102,7 @@ SPEC = ProviderSpec(
     # Nemotron 3.5 Lightning: NVIDIA's open model, the cheapest Nemotron Nebius
     # lists ($0.06 / $0.24 per million tokens, October 2026) and among its
     # fastest. Every other NVIDIA model follows it in the list.
-    preferred={"text": "nvidia/Nemotron-3_5-Lightning", "text_family": "nvidia/"},
+    preferred={"text": "nvidia/Nemotron-3_5-Lightning", "text_family": "nvidia/",
+               "text_why": "NVIDIA's cheapest, fastest Nemotron here",
+               "text_family_label": "NVIDIA Nemotron"},
 )

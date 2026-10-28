@@ -89,10 +89,11 @@ Basketball video (a file or a URL)
   │    Fusion + selection        one play per clip, scores and bonuses
   │    NVIDIA Nemotron (Nebius)  reranks the finalists
   │
-  ├─ Window refinement      YOLO + OCR of the game clock: start on the court, not a cutaway
-  ├─ NVIDIA Nemotron (Nebius)  titles, descriptions, hashtags, with each clip's
-  │                            score-bug note; the basketball title check
-  │                            rewrites any that name the wrong scorer
+  ├─ Window refinement      YOLO + OCR of the game clock: start on the court, not a
+  │                         cutaway (broadcast footage with a score bug only)
+  ├─ NVIDIA Nemotron (Nebius)  titles, descriptions, hashtags; with a score bug,
+  │                            each clip's score-bug note, and the basketball title
+  │                            check rewrites any that name the wrong scorer
   │
   ├─ Render (FFmpeg)        cut, captions from Whisper's word timings, 9:16 crop:
   │    E-BARD (YOLOv8n)     detects ball, hoop, players and referees per frame
@@ -122,13 +123,13 @@ always got, through the same prompts:
 - the events found beside it: crowd and buzzer sounds, audio spikes, motion,
   scene cuts and voice jumps;
 - the windows the basketball moments and signal peaks proposed;
-- for titles, each clip's score-bug note: who scored, the score, the quarter and
-  clock, and whether it was crunch time.
+- for titles, on footage with a score bug, each clip's score-bug note: who
+  scored, the score, the quarter and clock, and whether it was crunch time.
 
-No cloud model is ever sent the picture. The relabelling of reactions by a
-local vision model (courtside, bench, coach) only runs with a local vision
-model, so with Nemotron the reactions keep the labels the detectors and the
-commentary gave them.
+No cloud model is ever sent the picture. The relabelling of reaction shots
+(courtside, bench, coach) only runs with a local model that can see images, so
+with Nemotron the reactions keep the labels the detectors and the commentary
+gave them. (`gemma:7b`, the default, can't see images either.)
 
 ## Installation and demonstration
 
@@ -150,7 +151,7 @@ In the app:
 1. Open **Settings → AI → Direct provider API → Nebius Token Factory**.
 2. Paste the key and choose **Nemotron 3.5 Lightning**.
 3. Press **Test connection**.
-4. Go to **Add videos → Sports → Basketball**, add a game, and press Start.
+4. Go to **Add videos → Sports → Basketball**, add a game, and press **▶ Start queue**.
 
 Use footage you have the rights to. The demo uses a public-domain 1995
 high-school game from the Internet Archive.
@@ -175,7 +176,8 @@ Clips Kitty started in June 2026. During the hackathon's submission period
 - **2026-10-05 to 2026-10-21:** Basketball, including the E-BARD 9:16 crop
   (#151, #156) and release 2.1.0 (#168).
 
-330 of the repository's 753 commits fall inside the submission period. The
+331 of the 752 commits up to `34f0c23`, where this edition starts, were made
+inside the submission period. The
 WoopSocial publisher, the Clip Editor, Whisper and the YOLO and OpenCV work
 predate it or were built alongside.
 

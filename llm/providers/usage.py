@@ -70,5 +70,5 @@ def reset() -> None:
 def _int(value) -> int:
     try:
         return max(0, int(value or 0))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):  # Infinity, NaN
         return 0

@@ -60,15 +60,20 @@ FROZEN_VERSION = 1
 # ---- serve: the real app, with find_clips' inputs saved -------------------------
 
 
-def _video_of_caller() -> dict:
-    """process_video's `video`, read from the frame that called find_clips."""
+def _caller() -> tuple[dict, dict | None, bool]:
+    """From process_video's frame, the one that called find_clips: its `video`,
+    the job's own `config` (find_clips may get a copy with a larger shortlist
+    for Rate plugins) and whether the job chose plugin steps."""
     frame = inspect.currentframe()
     while frame is not None:
-        video = frame.f_locals.get("video")
+        local = frame.f_locals
+        video = local.get("video")
         if video is not None and hasattr(video, "video_id") and hasattr(video, "path"):
-            return {k: getattr(video, k, None) for k in ("video_id", "title", "channel", "duration", "path")}
+            info = {k: getattr(video, k, None) for k in ("video_id", "title", "channel", "duration", "path")}
+            config = local.get("config") if isinstance(local.get("config"), dict) else None
+            return info, config, bool(local.get("steps_chosen"))
         frame = frame.f_back
-    return {}
+    return {}, None, False
 
 
 def install_freeze(out_dir: Path) -> None:
@@ -78,7 +83,7 @@ def install_freeze(out_dir: Path) -> None:
     original = pipeline.find_clips
 
     def find_clips(video_path, segments, llm, config, *args, **kwargs):
-        video = _video_of_caller()
+        video, job_config, steps_chosen = _caller()
         frozen = {
             "version": FROZEN_VERSION,
             "saved_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -87,6 +92,8 @@ def install_freeze(out_dir: Path) -> None:
             "video_path": str(video_path),
             "segments": segments,
             "config": config,
+            "job_config": job_config,
+            "steps_chosen": steps_chosen,
             "args": args,
             "kwargs": kwargs,
         }
@@ -123,7 +130,8 @@ _STAGES = {
     "_ask": "direction",
     "look": "vision",
 }
-_EXPECTED_KEY = {"chunk scoring": "clips", "window scoring": "clips", "rerank": "order", "titles": "items"}
+_EXPECTED_KEY = {"chunk scoring": "clips", "window scoring": "clips", "rerank": "order", "titles": "items",
+                 "title check": "items"}
 
 
 def _stage() -> str:
@@ -256,6 +264,20 @@ def _backend(spec: str, config: dict, data_dir: Path):
     return create_backend(llm_cfg)
 
 
+def _title_origin(meta, first, fallback) -> str:
+    """Whose title a clip ended up with: the model's first answer, the model's
+    rewrite after the sport's check, the check's own from the scoreboard, or
+    the app's hook-based fallback for an answer it couldn't read."""
+    title = getattr(meta, "title", "")
+    if not title:
+        return "none"
+    if title == getattr(fallback, "title", None):
+        return "fallback"
+    if first is None or title == getattr(first, "title", None):
+        return "model"
+    return "rewritten or scoreboard"
+
+
 def cmd_replay(args) -> int:
     from analysis.fusion import find_clips
     from analysis.metadata import generate_metadata_batch
@@ -263,7 +285,11 @@ def cmd_replay(args) -> int:
     from llm.providers import usage
 
     frozen = pickle.loads(Path(args.frozen).read_bytes())
-    config = frozen["config"]
+    config = frozen["config"]                       # what find_clips got
+    job_config = frozen.get("job_config") or config  # what the rest of process_video uses
+    if frozen.get("steps_chosen"):
+        print("Note: this job chose plugin steps (Understand, Rate). Their LLM calls are not replayed, and the "
+              "titles are written for the whole shortlist find_clips returns.")
     kwargs = dict(frozen["kwargs"])
     sport = kwargs.get("sport")
     video_path = Path(args.video or frozen["video_path"])
@@ -277,32 +303,46 @@ def cmd_replay(args) -> int:
     print(f"Replaying {video.title} ({len(frozen['segments'])} segments) with {llm.name}")
     usage.reset()
     started = time.monotonic()
+    # A clip direction is parsed by the language model too, so it is parsed
+    # again with this backend rather than reused from the capture.
+    kwargs.pop("intent", None)
+    from core.pipeline import clip_direction
+
+    intent = clip_direction(job_config, llm, video.duration)
+    if intent is not None:
+        kwargs["intent"] = intent
     candidates, rejections = find_clips(video_path, frozen["segments"], llm, config, *frozen["args"], **kwargs)
     found_s = time.monotonic() - started
-    candidates = _refine_windows(sport, candidates, video, frozen["segments"], config)
+    candidates = _refine_windows(sport, candidates, video, frozen["segments"], job_config)
     refined_s = time.monotonic() - started - found_s
-    metas = []
+    metas, first = [], []
     if candidates:
+        ctx = kwargs.get("creator_context")
+        creator = ctx.summary if ctx else ""
         title_rules = getattr(sport, "title_rules", None)
         metas = generate_metadata_batch(
-            candidates, frozen["segments"], video.title, llm,
+            candidates, frozen["segments"], video.title, llm, creator_context=creator,
             **({"rules": title_rules()} if title_rules is not None else {}))
+        first = list(metas)
         check_titles = getattr(sport, "check_titles", None)
         if check_titles is not None:
             metas = check_titles(candidates, metas, lambda clips, rules: generate_metadata_batch(
-                clips, frozen["segments"], video.title, llm, rules=rules))
+                clips, frozen["segments"], video.title, llm, creator_context=creator, rules=rules))
     total_s = time.monotonic() - started
 
+    from analysis.metadata import _fallback
+
     clips = []
-    for c, meta in zip(candidates, metas or [None] * len(candidates)):
+    for i, (c, meta) in enumerate(zip(candidates, metas or [None] * len(candidates))):
         s = c.subscores or {}
         clips.append({
             "start": round(c.start, 2), "end": round(c.end, 2), "score": c.score,
             "hook": c.hook, "reason": c.reason, "source": c.source,
-            "moment": _plain(s.get("sport_moment") or s.get("game_kind") or s.get("game_why") or ""),
+            "moment": _plain(s.get("sport_label") or s.get("sport_event") or s.get("game_why") or ""),
             "subscores": _plain(s),
             "title": getattr(meta, "title", ""), "description": getattr(meta, "description", ""),
             "hashtags": list(getattr(meta, "hashtags", []) or []),
+            "title_origin": _title_origin(meta, first[i] if i < len(first) else None, _fallback(c, video.title)),
         })
     calls = llm.calls
     result = {
@@ -412,10 +452,23 @@ def cmd_compare(args) -> int:
         lines.append(f"| {stage} | " + " | ".join(cells) + " |")
     if len(runs) >= 2:
         a, b = runs[0], runs[1]
-        matched = [(x, max(b["clips"], key=lambda y: _overlap(x, y), default=None)) for x in a["clips"]]
-        same = [(x, y) for x, y in matched if y is not None and _overlap(x, y) >= 0.5]
+        # One to one: the closest pairs first, and no clip counted twice.
+        pairs = sorted(((_overlap(x, y), i, j) for i, x in enumerate(a["clips"]) for j, y in enumerate(b["clips"])),
+                       reverse=True)
+        used_a, used_b, same = set(), set(), []
+        for iou, i, j in pairs:
+            if iou >= 0.5 and i not in used_a and j not in used_b:
+                used_a.add(i)
+                used_b.add(j)
+                same.append((i, j))
         lines += ["", f"Clips both picked ({a['label']} vs {b['label']}, time overlap of at least half): "
                       f"{len(same)} of {len(a['clips'])} / {len(b['clips'])}.", ""]
+    lines += ["", "Where each run's final titles came from:", "",
+              "| Run | Model | Rewritten or from the scoreboard | App fallback |", "|---|---|---|---|"]
+    for run in runs:
+        origins = [c.get("title_origin") for c in run["clips"]]
+        lines.append(f"| {run['label']} | {origins.count('model')} | {origins.count('rewritten or scoreboard')} | "
+                     f"{origins.count('fallback')} |")
     for run in runs:
         lines += ["", f"#### {run['label']} (`{run['backend']}`)", "",
                   "| # | Window | Score | Source | Title |", "|---|---|---|---|---|"]

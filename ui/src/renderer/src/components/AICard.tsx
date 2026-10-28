@@ -564,6 +564,8 @@ function ProviderPanel({
               onChoose={choose}
               preferred={preferred}
               family={provider.preferred?.text_family}
+              why={provider.preferred?.text_why}
+              familyLabel={provider.preferred?.text_family_label}
             />
           ) : (
             <VoicePicker models={models} loading={loading} inUse={inUse} busy={busy} onChoose={choose} preferred={preferred} />
@@ -571,7 +573,9 @@ function ProviderPanel({
           {preferred && inUse !== preferred.id && (
             <p className="text-[11px] text-muted">
               ★ {t('Preferred')}: <span className="text-ink">{preferred.name}</span> · {shortPrice(preferred)} ·{' '}
-              {job === 'ai' ? t('the cheapest for text') : t('the cheapest with word timings')}{' '}
+              {job === 'ai'
+                ? provider.preferred?.text_why ?? t('the cheapest for text')
+                : t('the cheapest with word timings')}{' '}
               <button className="text-accent hover:underline" disabled={busy} onClick={() => choose(preferred.id)}>
                 {t('Use it')}
               </button>
@@ -1091,7 +1095,9 @@ function ModelPicker({
   busy,
   onChoose,
   preferred,
-  family
+  family,
+  why,
+  familyLabel
 }: {
   models: AIModel[]
   loading: boolean
@@ -1101,6 +1107,9 @@ function ModelPicker({
   preferred?: AIModel
   /** Models whose id starts with this come next, under the preferred one. */
   family?: string
+  /** The provider's words for its preferred model and its family, if it has its own. */
+  why?: string
+  familyLabel?: string
 }): JSX.Element {
   const [filter, setFilter] = useState('')
   const [sort, setSort] = useState<'maker' | 'price'>('maker')
@@ -1119,8 +1128,8 @@ function ModelPicker({
   const byPrice = [...shown].sort(cheapest)
 
   const groups: [string, AIModel[]][] = []
-  if (top) groups.push([t('★ Preferred: the cheapest for text'), [top]])
-  if (kin.length) groups.push([t('Gemma, the family local AI uses'), kin])
+  if (top) groups.push([why ? `★ ${t('Preferred')}: ${why}` : t('★ Preferred: the cheapest for text'), [top]])
+  if (kin.length) groups.push([familyLabel ?? t('Gemma, the family local AI uses'), kin])
   if (grouped) {
     const claimed = new Set<string>()
     for (const [label, prefixes] of VENDOR_GROUPS) {

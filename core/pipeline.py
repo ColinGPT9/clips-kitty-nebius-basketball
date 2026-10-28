@@ -119,6 +119,15 @@ def online_transcription(config: dict) -> dict | None:
     return {**settings, "data_dir": config["paths"]["data_dir"]}
 
 
+def _say_ai_usage(ai_usage, at_start: dict) -> None:
+    """The cloud tokens used while this job ran, as the provider reported them
+    (llm/providers/usage.py). The count is the whole engine's, so a chat with
+    the agent at the same time is in it too. Nothing for a local model."""
+    used = ai_usage.diff(at_start, ai_usage.totals())
+    if used:
+        print(f"      AI usage while this job ran, as the provider reported it: {ai_usage.summary(used)}")
+
+
 def clip_direction(config: dict, llm, duration: float):
     """The person's direction for this job (analysis/intent.py), or None.
 
@@ -202,7 +211,7 @@ def process_video(url: str, config: dict, db: StateDB, force: bool = False) -> l
     started = time.monotonic()
     from llm.providers import usage as ai_usage
 
-    usage_at_start = ai_usage.totals()  # cloud tokens this job is billed for, said after its titles
+    usage_at_start = ai_usage.totals()  # cloud tokens used while this job runs, said after its titles
 
     # Per-job, not per-process: the server is long-lived, so without this the
     # end-card tally would report every job it had ever run.
@@ -539,6 +548,7 @@ def process_video(url: str, config: dict, db: StateDB, force: bool = False) -> l
         # the scores -- so record it where the UI can read it instead of only
         # printing it to a log nobody opens.
         print(f"      {explain_no_clips(outcome)}")
+        _say_ai_usage(ai_usage, usage_at_start)
         db.set_video_status(video.video_id, "done")
         return []
     for c in candidates:
@@ -585,9 +595,7 @@ def process_video(url: str, config: dict, db: StateDB, force: bool = False) -> l
         metas = check_titles(candidates, metas, lambda clips, rules: generate_metadata_batch(
             clips, segments, video.title, llm,
             creator_context=(creator_ctx.summary if creator_ctx else ""), rules=rules))
-    used = ai_usage.diff(usage_at_start, ai_usage.totals())
-    if used:
-        print(f"      AI usage, as the provider reported it: {ai_usage.summary(used)}")
+    _say_ai_usage(ai_usage, usage_at_start)
 
     # Hashtags the request insisted on (chat: "put #creatorname on all of
     # them"). Appended after generation rather than asked of the model: a

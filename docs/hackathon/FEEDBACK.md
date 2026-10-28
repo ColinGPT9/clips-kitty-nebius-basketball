@@ -94,6 +94,7 @@ measured: `nebius_check.py --probe`, then the benchmark replays.
   in the Basketball pipeline (scoring commentary chunks and moment windows,
   reranking finalists, writing titles and descriptions).
 - Nemotron 3 Nano (`nemotron-3-nano:4b`) through Ollama was already in the app,
-  as a local option. Its earlier note in `KNOWN-ISSUES.md` is that it "works,
-  but found far fewer moments than the others", and that it returned empty clip
-  lists with reasoning off.
+  as a local option. `KNOWN-ISSUES.md` notes that it "works, but found far fewer
+  moments than the others". The comment on `_THINK_TO_ANSWER` in
+  `llm/ollama_backend.py` notes that with reasoning off it answered an empty
+  clip list where `gemma:7b` found ten clips.
