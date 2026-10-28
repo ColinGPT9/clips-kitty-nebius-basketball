@@ -145,10 +145,51 @@ Colin should spot-check them by watching the clips.
 
 | Run | Status |
 |---|---|
-| `gemma` (app run, job 1) | _running on CPU_ |
+| `gemma` (app run, job 1) | done, 2026-10-28: 6 clips in 88.8 min, below |
 | `gemma` (replay) | _not yet run_ |
 | `nemotron` (replay) | _waiting for a Nebius key_ |
 | `gemma-nebius` (replay) | _waiting for a Nebius key_ |
+
+### The app run: Gemma, the whole job (job 1)
+
+The real app, from the file to rendered clips, with `ollama/gemma:7b` on the
+test machine's CPU. Whisper, the read of the game, the language model, E-BARD
+framing and FFmpeg all ran. It took 88.8 minutes. About an hour of that was the
+language model: the inputs were frozen at 10:09 and the first clip was rendered
+at 11:11.
+
+| # | Window (s) | Score | Reference | Title and description | Title judged |
+|---|---|---|---|---|---|
+| 1 | 1111.7–1146.8 | 86 | **R13, the game-winner** | "Marauders' Hail Mary": "Kamah makes a crucial play to regain possession for Belmont." | Wrong. Kamah's drive wins it for Salem, and it isn't a Hail Mary |
+| 2 | 780.3–808.5 | 82 | none. Mostly talk about fouling tactics, then "money free throw by Kamah" | "Free Throw Gamble": "Kamah attempts a costly free throw in a tight game." | Wrong. He makes it |
+| 3 | 407.7–423.4 | 82 | **R6**, Penn's steal from Conley | "Salem's Defensive Stance": "Doug Conley struggles to handle Penn's quick ball movement." | Right players and team, though it doesn't say "steal" |
+| 4 | 290.8–307.4 | 74 | the last 4 s of R4 (the Kleenex). Mostly talk, then a pass to Kamal | "Kamal's Seamless Pass" | Wrong. Kamal receives the pass |
+| 5 | 820.5–835.5 | 70 | R10, 58–57 and Penn's turnover | "Marauders Close Out": "Belmont narrowly edges out Penn in the final minutes", #gamewinner | Wrong. Penn is a player, and Belmont lost |
+| 6 | 242.3–254.7 | 67 | R3, the no-call | "Controversial Call": "A questionable refereeing decision impacts Downes' scoring opportunity." | Right |
+
+- **Selection:** 4 of the 6 clips are reference plays, and 2 of the 7 must-haves
+  are there: R6 and R13.
+- **Missed moments:** R1 (the putback and timeout), R2 (Mateo's three), R7 (the
+  block and steal), R9 (Costello's strip) and R14 (the last three seconds and
+  the court storm).
+- **False positives:** clip 4 is mostly talk. Clip 2 is mostly talk too, but it
+  ends on a real free throw that the reference list doesn't have.
+- **Ranking:** the game-winner was ranked first.
+- **Titles:** 2 of 6 right. 4 name the wrong team, the wrong result or the wrong
+  direction of a pass. There is no score bug on this footage, so the basketball
+  title check had nothing to hold them to.
+- **Structured responses:** Ollama's model runner stopped once while the
+  windows were scored ("model runner has unexpectedly stopped"), and the app
+  asked again without JSON mode. Every other answer was read.
+- **Rendering:** every clip was rendered 1080×1920. E-BARD framing ran in
+  "assisted" mode (the ball led 0–30% of each play). The 4:3 VHS picture sits on
+  a blurred fill with word-synced captions. The end card was skipped because
+  the container lacks the Windows font it uses. That's a property of the test
+  machine, not of this change.
+
+The selection, interpretation and title judgements above were made by Claude,
+reading each clip's transcript against the reference list, and checking the
+rendered game-winner clip's picture.
 
 <!-- RESULTS -->
 

@@ -151,8 +151,9 @@ On 2026-10-28, on a 4-core Linux container with no GPU (Python 3.11, CPU PyTorch
 - **Offline:** `pytest tests/test_nebius.py tests/test_ai_api.py tests/test_llm_adapters.py`
   passed, and so did the UI typecheck (`cd ui && npm ci && npm run typecheck`).
 - **Option C with the local Gemma** (`ollama/gemma:7b`), on the 22-minute game
-  above, started through `llm_bench.py serve`: <!-- GEMMA RUN STATUS -->_running at
-  the time of writing_.
+  above, started through `llm_bench.py serve`: ran end to end, from the file to six
+  rendered 1080×1920 clips with E-BARD framing and captions, in 88.8 minutes.
+  The clips are judged in [BENCHMARKS.md](BENCHMARKS.md#results).
 - **Not yet run with a live Nebius key:** options A, B and C on Nemotron. See the
   status table in [BENCHMARKS.md](BENCHMARKS.md). This line is updated once
   they have run.
