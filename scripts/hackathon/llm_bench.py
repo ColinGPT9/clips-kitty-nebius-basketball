@@ -36,12 +36,14 @@ backend sees the same evidence.
 from __future__ import annotations
 
 import argparse
+import atexit
 import copy
 import inspect
 import json
 import os
 import pickle
 import re
+import shutil
 import sys
 import tempfile
 import time
@@ -241,12 +243,16 @@ def _backend(spec: str, config: dict, data_dir: Path):
     llm_cfg["backend"] = spec
     llm_cfg["data_dir"] = str(data_dir)
     provider = spec.partition("/")[0]
-    env_key = os.environ.get(f"{provider.upper()}_API_KEY")
+    env_key = os.environ.get(f"{provider.upper()}_API_KEY", "").strip()
     if env_key and provider != "ollama":
+        # The app reads keys from its own store: the key from the environment
+        # goes into a private folder of its own, removed on exit.
         from llm.providers import keys
 
-        if not keys.has_key(data_dir, provider):
-            keys.save_key(data_dir, provider, env_key)
+        key_dir = Path(tempfile.mkdtemp(prefix="ck-bench-key-"))
+        atexit.register(shutil.rmtree, key_dir, True)
+        keys.save_key(key_dir, provider, env_key)
+        llm_cfg["data_dir"] = str(key_dir)
     return create_backend(llm_cfg)
 
 

@@ -1,0 +1,167 @@
+# Gemma vs Nemotron on the same basketball game
+
+**Question.** What changes when the Basketball pipeline's language model is
+NVIDIA Nemotron on Nebius Token Factory instead of Clips Kitty's default Gemma,
+with everything else held constant?
+
+**Status.** See the run table under [Results](#results). A run is reported
+only once it has actually been made. Nothing below is estimated or projected.
+
+## Method
+
+### The game
+
+[*BHS Sports TV Presents: Varsity Boys Basketball – Belmont Marauders vs Salem
+Witches, 03/11/1995*](https://archive.org/details/basketball95), from Belmont Media
+Center, marked **Public Domain Mark 1.0**. It is 81 minutes of 640×480 VHS, shot
+handheld from the stands, with two commentators and no score bug. The benchmark
+uses the final 22:27 (`ffmpeg -ss 3510 … -c copy`). In that stretch the lead
+changes hands in the last minute and Salem wins 61–59 on a drive with about
+five seconds left. Belmont then fails to get a shot off from a three-second
+inbound, and the crowd storms the court.
+
+This is a hard case for Basketball mode. There is no score bug, so there are no
+confirmed baskets from OCR. Only one camera is used, so there are no broadcast
+cutaways. All the plays come from the commentary, the crowd and the picture.
+
+### Holding everything but the language model constant
+
+The pipeline asks its language model nothing until `find_clips`
+(`analysis/fusion.py`). By then every other reading of the game is finished.
+`scripts/hackathon/llm_bench.py serve` runs the real app and saves exactly what
+`find_clips` received, before it runs:
+
+- the Whisper transcript (`small` on CPU, 314 segments with word timings);
+- the audio and visual curves (FFmpeg and OpenCV);
+- PANNs' game sounds (9 crowd cheers);
+- the `BasketballProfile`, with its score-bug pass (none on screen), the
+  COCO-YOLO shots and the 7 cutaways it found.
+
+The saved file is `local_1144e6ee30c4.pkl`, 0.3 MB.
+
+`llm_bench.py replay` loads that file and runs, with one named backend:
+
+1. `find_clips`: the language model scores each commentary chunk and the
+   moment and signal windows, the basketball moments are built, scores are
+   fused and the plays selected, and the language model reranks the finalists.
+2. The basketball window refinement. This is YOLO plus OCR of the clock, and it
+   is deterministic for a given window.
+3. Titles and descriptions, then the basketball title check.
+
+All three use the app's own code, unchanged. Every language-model call goes
+through a meter that records:
+
+- the pipeline step that made it;
+- its duration;
+- whether the answer held the JSON object that step reads (judged the way the
+  app's own parsers find it);
+- the tokens the provider reported.
+
+Whisper, PANNs, OCR, YOLO, OpenCV and E-BARD are **not** run again. The same
+source, transcript and detections go to every backend. Rendering (FFmpeg,
+E-BARD framing) comes after the language model's last decision and doesn't
+change what was picked, so it is left out of the timings.
+
+**Only the model is changed.** The prompts, schemas, chunk sizes
+(`analysis.chunk_seconds: 300`), thresholds (`clips.min_score: 55`) and the
+Highlights choice (**Best moments**) are the app's defaults for every run.
+
+**One difference comes from the backends themselves, not the benchmark.** A cloud
+backend is asked for a strict JSON schema, with the app's existing fallbacks to
+a JSON object and then plain text. Ollama is asked for `format: json` with a
+1,024-token answer limit. That has always been true of local and cloud models in
+Clips Kitty (`llm/base.generate_json`). The third run below, Gemma on Nebius,
+separates the model from the way it is served.
+
+### The runs
+
+| Label | Backend | Where it runs |
+|---|---|---|
+| `gemma` | `ollama/gemma:7b`, the app's default in `config/settings.yaml` | Ollama 0.40.12 (Q4 GGUF) on the 4-core CPU of the test machine, no GPU |
+| `nemotron` | `nebius/nvidia/Nemotron-3_5-Lightning`, the preferred Nebius model | Nebius Token Factory |
+| `gemma-nebius` | `nebius/google/gemma-3-27b-it`: Gemma on the same API as Nemotron | Nebius Token Factory |
+
+Test machine: a 4 vCPU, 16 GB Linux cloud container, Python 3.11, CPU-only.
+Local Gemma's latency there is far slower than on a creator's GPU. Treat its
+timings as a lower bound on speed, not as typical.
+
+### Reference: the plays a highlights editor would want
+
+There is no official play-by-play for a 1995 high-school game. This list was
+written by Claude from the Whisper transcript, before any model's clips were
+seen. Frames were checked at the two that matter most (1115 s: Kamah's drive;
+1268 s: the court storm). Each item is a play the commentary describes as it
+happens. Times are seconds into the 22-minute file.
+
+| # | When (s) | Play | Kind |
+|---|---|---|---|
+| R1 | 57–73 | Kohane's jumper misses, and Christensen's putback gives Belmont its largest lead, 5. Salem calls a timeout and the crowd cheers | putback, crowd |
+| R2 | 170–182 | Mateo's "big three-pointer" for Salem | three |
+| R3 | 235–264 | Downes' wild shot. A no-call, then a travel call; "Belmont fans very upset" | controversy, crowd |
+| R4 | 268–295 | No towel in the gym, so the ref wipes the floor with a Kleenex | light moment |
+| R5 | 337–361 | Penn's defensive play ties it at 54, and Christensen scores inside | defense, post score |
+| R6 | 393–418 | Christensen's big rebound, then Penn steals it from Conley | rebound, steal |
+| R7 | 497–510 | Penn is blocked by LaPierre, Mateo steals it, and Belmont is fouled | block, steal |
+| R8 | 551–567 | Christensen's "big free throw" | free throw |
+| R9 | 587–604 | Costello strips Penn, Penn misses a three, Conley rebounds | steal |
+| R10 | 824–837 | 58–57 with a minute left, and Penn turns it over | turnover, clutch |
+| R11 | 849–895 | Christensen is fouled: "the biggest free throws of this kid's career" in a standing, loud gym | clutch free throws |
+| R12 | 976–995 | Christensen misses the first and makes the second: tied with 33 s left | clutch free throw |
+| R13 | 1107–1158 | Kamah "shakes and bakes" and scores with about five seconds left. Time is put back on the clock | **game-winner** |
+| R14 | 1158–1280 | The last three seconds: the inbound, no shot, "Salem wins it", and the crowd storms the court | final possession, **court storm** |
+
+The must-haves for a highlights page are R1, R2, R6, R7, R9, R13 and R14.
+
+### What is measured
+
+| Measure | How |
+|---|---|
+| Highlight selection | The clips each run kept, matched to the reference by time overlap |
+| Missed moments | Must-have reference plays with no clip overlapping them |
+| False positives | Kept clips that overlap no reference play and show no play of their own on review: talk, timeouts, the broadcast's sign-off |
+| Candidate ranking | Each kept clip's final score, and where the must-haves land in the order |
+| Event interpretation | Whether each clip's hook and reason describe what happens in it |
+| Title and description accuracy | Each title read against its clip's transcript: right team, right player, right result, nothing invented |
+| Structured response reliability | The share of calls whose answer held the JSON object the step reads, the calls retried, and the fallbacks used |
+| Inference latency | Seconds per call and per step, and the total language-model time |
+| API usage | Calls, and the prompt, completion, cached and reasoning tokens the provider reported (Ollama doesn't report them through the app) |
+| Cost | Nebius' reported tokens × its listed prices, read from its public catalogue at compare time. Local Gemma has no per-token cost |
+
+The selection, interpretation and title judgements are made by reading each
+clip's transcript against the reference, by Claude, and are marked as such.
+Colin should spot-check them by watching the clips.
+
+## Results
+
+| Run | Status |
+|---|---|
+| `gemma` (app run, job 1) | _running on CPU_ |
+| `gemma` (replay) | _not yet run_ |
+| `nemotron` (replay) | _waiting for a Nebius key_ |
+| `gemma-nebius` (replay) | _waiting for a Nebius key_ |
+
+<!-- RESULTS -->
+
+## Reproduce
+
+```bash
+# 1. The real app, with find_clips' inputs saved on the way (the job runs as usual).
+CLIPS_STUDIO_DATA_DIR=$PWD/bench-data python scripts/hackathon/llm_bench.py serve --freeze bench/frozen -- --port 8765
+curl -X POST localhost:8765/queue/resume
+curl -X POST localhost:8765/videos/local -H 'content-type: application/json' -d '{"path": "'$PWD'/belmont-salem-1995-final.mp4",
+  "title": "Belmont Marauders vs Salem Witches, boys varsity basketball, 1995 (final 22 minutes)",
+  "channel": "BHS Sports TV", "sport": {"name": "basketball", "highlights": "best", "period": "full"}}'
+
+# 2. Replays: only the language-model stages, on the saved inputs.
+F=bench/frozen/local_1144e6ee30c4.pkl
+python scripts/hackathon/llm_bench.py replay $F --backend ollama/gemma:7b --label gemma --out bench/runs
+NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend nebius/nvidia/Nemotron-3_5-Lightning --label nemotron --out bench/runs
+NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend nebius/google/gemma-3-27b-it --label gemma-nebius --out bench/runs
+
+# 3. Tables.
+python scripts/hackathon/llm_bench.py compare bench/runs/gemma.json bench/runs/nemotron.json bench/runs/gemma-nebius.json
+```
+
+The frozen inputs and every run's JSON (each call's step, time, JSON check, usage
+and the first 400 characters of its answer) are kept in
+`docs/hackathon/bench/`, so the tables can be checked.

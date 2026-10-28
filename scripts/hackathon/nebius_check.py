@@ -24,8 +24,10 @@ pass --data-dir (the folder Settings → AI saved it in). It is never printed.
 from __future__ import annotations
 
 import argparse
+import atexit
 import json
 import os
+import shutil
 import sys
 import tempfile
 import time
@@ -37,25 +39,49 @@ if str(ROOT) not in sys.path:
 
 DEFAULT_MODEL = "nvidia/Nemotron-3_5-Lightning"
 
-# The last half minute of the public-domain 1995 Belmont vs Salem game
-# (archive.org/details/basketball95), as Whisper wrote it: the shape of every
-# chunk a Basketball job sends.
-SAMPLE = """[1290.0 - 1296.5] They have three seconds left, they just can't turn it over and get a shot off.
-[1296.5 - 1303.0] Plenty of time to get a shot off, as Matt sets up at the free throw line.
-[1303.0 - 1309.0] Costello on the weak side of the floor, where he is deadly.
-[1309.0 - 1314.5] Here it is, plain and simple. The quarterback gets it in bounds.
-[1314.5 - 1320.0] And it's not going to happen! They didn't get a shot off!
-[1320.0 - 1327.0] And Salem charges the court! Salem wins it, sixty-one to fifty-nine!
-[1327.0 - 1334.0] Belmont played a great game, but couldn't get it done here in the second half."""
+# The final possession of the public-domain 1995 Belmont vs Salem game
+# (archive.org/details/basketball95), exactly as Whisper wrote it in a Basketball
+# job here, 1222.9 s to 1290.1 s into the game's last 22 minutes.
+SEGMENTS = [
+    (1222.9, 1223.9, "They got three seconds left."),
+    (1224.6, 1225.6, "They just can't turn it over."),
+    (1225.7, 1226.4, "Get a shot off."),
+    (1227.3, 1229.0, "Plenty of time to get a shot off."),
+    (1231.0, 1233.2, "And there's Matt right to the free throw line."),
+    (1233.6, 1236.0, "Costello left side of the floor where he is deadly."),
+    (1237.3, 1239.2, "Doug Conley, quarterback taking out a bounce"),
+    (1241.2, 1242.7, "Okay, Marauders now"),
+    (1243.2, 1248.9, "There it is, plain and simple, Dougie's got to toss it up, avoid, avoid the sign"),
+    (1250.3, 1252.2, "Adam, you got Lapierre here in the front court"),
+    (1253.0, 1255.6, "He's just out of the way, I'll tell you right now"),
+    (1256.6, 1259.5, "Costello, he's going to catch it. The ball is going to Christensen"),
+    (1260.1, 1264.6, "Okay, here we go, the quarterback gets it in, bounce, and it's not going to do it"),
+    (1264.6, 1272.8, "Salem wins it. So the Salem wins the ball game. Marauders didn't get a shot off and "
+                     "they're upset"),
+    (1275.1, 1279.8, "So and they go off and they charge the court Marauders played a great game"),
+    (1280.5, 1284.3, "But couldn't get it done here in the second half Salem an excellent ballclub"),
+    (1284.3, 1290.1, "Scoot Salem is an excellent ballclub. You got to give it to him Belmont had a "
+                     "fantastic season"),
+]
+# The same job's game sounds (PANNs) had nothing in this stretch: its last
+# "a crowd cheering" was at 1209 s. So this chunk's prompt has no events block.
+EVENTS: list[tuple[float, str]] = []
 
 
 def _key(args) -> tuple[Path, str]:
     from llm.providers import keys
 
-    data_dir = Path(args.data_dir) if args.data_dir else Path(tempfile.mkdtemp(prefix="ck-nebius-"))
     env_key = os.environ.get("NEBIUS_API_KEY", "").strip()
     if env_key:
+        # The app reads keys from its own store, so the key from the
+        # environment goes into a private folder of its own, removed on exit.
+        data_dir = Path(tempfile.mkdtemp(prefix="ck-nebius-"))
+        atexit.register(shutil.rmtree, data_dir, True)
         keys.save_key(data_dir, "nebius", env_key)
+    elif args.data_dir:
+        data_dir = Path(args.data_dir)
+    else:
+        sys.exit("No Nebius key: set NEBIUS_API_KEY, or pass --data-dir with a key saved in Settings → AI.")
     key = keys.load_key(data_dir, "nebius")
     if not key:
         sys.exit("No Nebius key: set NEBIUS_API_KEY, or pass --data-dir with a key saved in Settings → AI.")
@@ -69,11 +95,12 @@ def _prompt() -> str:
 
     config = {"clips": {"sport": {"name": "basketball", "highlights": "best", "period": "full"}}}
     guidance = sports.profile_for(config).guidance("clips")
-    first, last = float(SAMPLE.split("]")[0].strip("[").split(" - ")[0]), float(SAMPLE.split("[")[-1].split(" - ")[1].split("]")[0])
+    transcript = "\n".join(f"[{start:.1f} - {end:.1f}] {text}" for start, end, text in SEGMENTS)
     prompt = (ROOT / "config" / "prompts" / "score_clips.txt").read_text(encoding="utf-8")
-    prompt = prompt.replace("{transcript}", SAMPLE)
+    prompt = prompt.replace("{transcript}", transcript)
     prompt = prompt.replace("{mode_guidance}", _guidance_block(guidance))
-    prompt = prompt.replace("{events}", _events_block(EVENTS, first, last, "GAME / CHAT / AUDIO EVENTS"))
+    prompt = prompt.replace("{events}", _events_block(EVENTS, SEGMENTS[0][0], SEGMENTS[-1][1],
+                                                      "GAME / CHAT / AUDIO EVENTS"))
     prompt = prompt.replace("{min_duration}", "10").replace("{max_duration}", "60")
     return prompt
 
@@ -155,7 +182,7 @@ def main(argv=None) -> int:
             u = data.get("usage") or {}
             reasoning = (u.get("completion_tokens_details") or {}).get("reasoning_tokens")
             print(f"   {label:12} {seconds:5.1f}s  finish={choice.get('finish_reason')}  "
-                  f"parsed={'yes, %d clip(s)' % len(found) if found is not None else 'no'}  "
+                  f"parsed={f'yes, {len(found)} clip(s)' if found is not None else 'no'}  "
                   f"thinking={'apart' if apart else 'in the answer' if inline else 'none seen'}  "
                   f"tokens in/out={u.get('prompt_tokens')}/{u.get('completion_tokens')}"
                   + (f" ({reasoning} reasoning)" if reasoning else ""))
