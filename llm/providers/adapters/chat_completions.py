@@ -2,8 +2,10 @@
 provider that speaks it (a new one is a ProviderSpec, not new code)."""
 
 import json
+import re
 
 from llm.base import ChatTurn, ToolCall
+from llm.providers import usage
 from llm.providers.base import LLMError, ModelInfo, ProviderSpec
 from llm.providers.http import send
 
@@ -44,6 +46,7 @@ def generate(spec: ProviderSpec, key: str, model: str, prompt: str, *,
             body["response_format"] = formats[index]
         try:
             data = send(spec, key, "POST", "/chat/completions", json_body=spec.body_extras(body))
+            usage.record(spec.id, model, data)
         except LLMError as e:
             # Only a refusal of the format is worth another try with a looser
             # one. The prompt asks for the same JSON either way, and every
@@ -71,6 +74,7 @@ def chat(spec: ProviderSpec, key: str, model: str, messages: list[dict], tools: 
     if tools:
         body["tools"] = tools
     data = send(spec, key, "POST", "/chat/completions", json_body=spec.body_extras(body))
+    usage.record(spec.id, model, data)
     message = _choice(spec, data).get("message") or {}
     calls = []
     for call in message.get("tool_calls") or []:
@@ -80,7 +84,7 @@ def chat(spec: ProviderSpec, key: str, model: str, messages: list[dict], tools: 
             name=str(fn.get("name") or ""),
             arguments=_arguments(fn.get("arguments")),
         ))
-    return ChatTurn(text=_content(message.get("content")), tool_calls=calls)
+    return ChatTurn(text=_without_thinking(_content(message.get("content"))), tool_calls=calls)
 
 
 def list_models(spec: ProviderSpec, key: str) -> list[ModelInfo]:
@@ -132,9 +136,27 @@ def _choice(spec: ProviderSpec, data: dict) -> dict:
     return choices[0]
 
 
+# A reasoning model served without a reasoning parser (Nemotron on some vLLM
+# hosts) writes its thinking into the answer: "<think>...</think>{...}", or,
+# when the chat template opened the tag itself, "...</think>{...}". The
+# parsers take the first "{" to the last "}", so a brace in the thinking
+# would lose the whole answer. Thinking that the host sends apart, in
+# "reasoning_content", is never read.
+_THOUGHT = re.compile(r"^\s*<think>.*?</think>\s*", re.S)
+
+
+def _without_thinking(text: str) -> str:
+    text = _THOUGHT.sub("", text, count=1)
+    if "</think>" in text:
+        text = text.rsplit("</think>", 1)[1]
+    if text.lstrip().startswith("<think>"):
+        return ""  # still thinking when it stopped: no answer, which _text says
+    return text
+
+
 def _text(spec: ProviderSpec, data: dict) -> str:
     choice = _choice(spec, data)
-    text = _content((choice.get("message") or {}).get("content"))
+    text = _without_thinking(_content((choice.get("message") or {}).get("content")))
     if not text.strip():
         if choice.get("finish_reason") == "length":
             raise LLMError("bad_response", f"The {spec.label} model ran out of room before answering. "

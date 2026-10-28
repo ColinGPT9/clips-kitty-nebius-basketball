@@ -8,11 +8,14 @@ ProviderSpec to _ORDER, the way xAI and Meta are below. The API, the settings
 card and the pipeline all read PROVIDERS; nothing else needs to change. A
 provider with its own wire format adds one file in adapters/ as well.
 
+Nebius Token Factory (nebius.py) serves open models, NVIDIA Nemotron among
+them, on the user's own Nebius key.
+
 Llama is not a separate entry: Meta's own API serves Muse Spark, and Llama 4
 is reached through OpenRouter (meta-llama/...), on the same OpenRouter key.
 """
 
-from llm.providers import anthropic, gemini, openai, openrouter
+from llm.providers import anthropic, gemini, nebius, openai, openrouter
 from llm.providers.base import ModelInfo, ProviderSpec
 
 
@@ -139,6 +142,7 @@ _ORDER: tuple[ProviderSpec, ...] = (
     META,
     DEEPSEEK,
     QWEN,
+    nebius.SPEC,
 )
 
 PROVIDERS: dict[str, ProviderSpec] = {spec.id: spec for spec in _ORDER}

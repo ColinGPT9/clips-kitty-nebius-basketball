@@ -647,6 +647,8 @@ const EXTERNAL_ALLOWED = [
   /^https:\/\/dev\.meta\.ai\//,
   /^https:\/\/(platform|api-docs)\.deepseek\.com\//,
   /^https:\/\/www\.alibabacloud\.com\/help\/en\/model-studio\//,
+  /^https:\/\/tokenfactory\.nebius\.com\//,
+  /^https:\/\/nebius\.com\/token-factory\//,
   // Plans signed in to instead of a key (llm/signin/). The ChatGPT sign-in
   // page Codex hands back is on auth.openai.com, and has to open in the
   // system browser; the plan's usage and what it includes are OpenAI pages.

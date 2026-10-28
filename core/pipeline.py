@@ -200,6 +200,9 @@ def process_video(url: str, config: dict, db: StateDB, force: bool = False) -> l
 
     data_dir = Path(config["paths"]["data_dir"])
     started = time.monotonic()
+    from llm.providers import usage as ai_usage
+
+    usage_at_start = ai_usage.totals()  # cloud tokens this job is billed for, said after its titles
 
     # Per-job, not per-process: the server is long-lived, so without this the
     # end-card tally would report every job it had ever run.
@@ -582,6 +585,9 @@ def process_video(url: str, config: dict, db: StateDB, force: bool = False) -> l
         metas = check_titles(candidates, metas, lambda clips, rules: generate_metadata_batch(
             clips, segments, video.title, llm,
             creator_context=(creator_ctx.summary if creator_ctx else ""), rules=rules))
+    used = ai_usage.diff(usage_at_start, ai_usage.totals())
+    if used:
+        print(f"      AI usage, as the provider reported it: {ai_usage.summary(used)}")
 
     # Hashtags the request insisted on (chat: "put #creatorname on all of
     # them"). Appended after generation rather than asked of the model: a
