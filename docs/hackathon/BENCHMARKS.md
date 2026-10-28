@@ -146,7 +146,7 @@ Colin should spot-check them by watching the clips.
 | Run | Status |
 |---|---|
 | `gemma` (app run, job 1) | done, 2026-10-28: 6 clips in 88.8 min, below |
-| `gemma` (replay) | _not yet run_ |
+| `gemma` (replay) | done, 2026-10-28: 7 clips, 14 calls, 56.8 min, below |
 | `nemotron` (replay) | _waiting for a Nebius key_ |
 | `gemma-nebius` (replay) | _waiting for a Nebius key_ |
 
@@ -191,6 +191,45 @@ The selection, interpretation and title judgements above were made by Claude,
 reading each clip's transcript against the reference list, and checking the
 rendered game-winner clip's picture.
 
+### The replay: Gemma on the saved evidence
+
+`llm_bench.py replay … --backend ollama/gemma:7b --label gemma`. It is the same
+model on the same evidence as the app run, so it also shows how much one model
+varies from run to run. The run's file is [bench/gemma.json](bench/gemma.json).
+
+| Step | Calls | Usable JSON | Mean seconds per call |
+|---|---|---|---|
+| Chunk scoring | 6 | 6 | 316.3 |
+| Window scoring | 6 | 6 | 209.8 |
+| Rerank | 1 | 1 | 60.3 |
+| Titles | 1 | 1 | 188.3 |
+| **Total** | **14** | **14** | **3,405 s (56.8 min)** |
+
+The basketball title check made no calls, because there is no score bug to
+check against. Ollama's runner stopped once again during window scoring. The
+backend asked again without JSON mode, inside the call, so the meter counts
+that call as one usable answer. Ollama doesn't report tokens through the app,
+and the run has no per-token cost.
+
+| # | Window (s) | Score | Reference | Title and description | Title judged |
+|---|---|---|---|---|---|
+| 1 | 785.9–808.5 | 83 | none: talk, then Kamah's free throw | "Free Throw": "Kamah sinks a free throw after Penn attempts a questionable play." | Partly. He makes it, but Penn tries nothing |
+| 2 | 242.3–254.7 | 82 | R3, the no-call | "Downes' Wild Shot": "Downes attempts a contested shot after receiving the ball from LaPierre." | Partly. LaPierre defends, and the no-call is missed |
+| 3 | 407.7–423.4 | 81 | **R6**, Penn's steal | "Conley's Struggles": "Doug Conley struggles to handle the ball against Penn's pressure." | Right |
+| 4 | 290.8–307.4 | 76 | the last 4 s of R4 | "Kamal's Move": "Kamal makes a play to receive the ball from the referee." | Wrong |
+| 5 | 820.5–835.5 | 71 | R10 | "Marauders Close": "The Marauders take the lead with just over a minute remaining." | Wrong. They already led, and Penn's turnover is missed |
+| 6 | 1118.0–1145.5 | 69 | **R13, the game-winner** | "Kamah's Highlight": "Kamah makes a strong move to regain possession for the Marauders." | Wrong team |
+| 7 | 885.0–908.9 | 57 | the end of R11 | "Witches' Timeout": "Salem calls a timeout with the game tied." | Wrong. The Witches lead by one, and the Marauders need the timeout |
+
+- **Against the app run:** the same six plays were picked again, each with a
+  time overlap of at least 0.78, plus one more (clip 7). The game-winner fell
+  from first to sixth of seven, and every title was written differently. So a
+  single run of one model can't separate two models on ranking or titles. The
+  Nemotron replay is run twice for that reason.
+- **Selection:** 2 of the 7 must-haves again (R6 and R13), and the same five are
+  missed: R1, R2, R7, R9 and R14.
+- **Titles:** 1 right, 2 partly right, 4 wrong.
+
 <!-- RESULTS -->
 
 ## Reproduce
@@ -207,6 +246,7 @@ curl -X POST localhost:8765/videos/local -H 'content-type: application/json' -d 
 F=bench/frozen/local_1144e6ee30c4.pkl
 python scripts/hackathon/llm_bench.py replay $F --backend ollama/gemma:7b --label gemma --out bench/runs
 NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend nebius/nvidia/Nemotron-3_5-Lightning --label nemotron --out bench/runs
+NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend nebius/nvidia/Nemotron-3_5-Lightning --label nemotron-2 --out bench/runs
 NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend nebius/google/gemma-3-27b-it --label gemma-nebius --out bench/runs
 
 # 3. Tables.

@@ -165,7 +165,8 @@ what Nemotron did worse, are in **[docs/hackathon/BENCHMARKS.md](docs/hackathon/
 
 | Run | Must-have plays found | Titles right | Language-model time | Cost |
 |---|---|---|---|---|
-| Gemma (`gemma:7b`, local, 4-core CPU) | 2 of 7 | 2 of 6 | about an hour | none (local) |
+| Gemma (`gemma:7b`, local, 4-core CPU), app run | 2 of 7 | 2 of 6 | about 60 min | none (local) |
+| Gemma, replay on the same evidence | 2 of 7 | 1 of 7, 2 partly | 56.8 min | none (local) |
 | Nemotron 3.5 Lightning (Nebius) | _not yet run_ | _not yet run_ | _not yet run_ | _not yet run_ |
 
 <!-- BENCHMARK SUMMARY: the Nemotron row is filled from BENCHMARKS.md once its replay has run. -->
