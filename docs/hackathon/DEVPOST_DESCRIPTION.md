@@ -94,6 +94,12 @@ backend. Gemma and Nemotron see identical evidence.
   braces in its thinking, so a whole chunk's clips could be lost. Nebius
   documents `reasoning_content`, but not how each Nemotron model returns its
   thinking. The adapter now handles thinking that comes back apart, inline, or not at all.
+- **Thinking that never ended.** On the first live run, Nemotron spent all
+  8,192 output tokens the app allows thinking about the first chunk of a game,
+  answered nothing, and the job failed. Asking for `reasoning_effort: "low"`
+  didn't shorten it. Turning thinking off through the chat template
+  (`enable_thinking: false`) did: the same game then ran end to end, with every
+  answer usable. The Nebius provider now sends that switch to NVIDIA models.
 - **Models change fast.** Two of the five NVIDIA models in today's
   catalogue are retired on 2026-11-09, and requests aren't rerouted. So the app
   never hard-codes a Nebius model. It lists the live ones and only prefers one.
@@ -113,14 +119,29 @@ backend. Gemma and Nemotron see identical evidence.
   change lets a provider word its own preferred model.
 - A benchmark that holds everything but the model constant, and reports what
   each model did worse as well as better.
-- 25 new offline tests cover every documented Nebius error body, rate-limit
-  waits, thinking inline or apart, answers that only quote the closing tag, and
-  usage.
+- One real game, a 43-minute NBA broadcast, ran end to end on Nemotron through
+  Nebius: 43 calls, every answer usable, 62 rendered clips, for under a cent
+  ($0.009).
+- 26 new offline tests cover every documented Nebius error body, rate-limit
+  waits, thinking inline or apart, Nemotron asked not to think, answers that
+  only quote the closing tag, and usage.
 
 ## What we learned
 
-<!-- From BENCHMARKS.md, once the Nemotron replays have run: structured-output
-reliability, latency, cost, and where the two models' picks differed. -->
+Measured on one 43-minute NBA broadcast, on an RTX 3060
+([BENCHMARKS.md](BENCHMARKS.md#live-run-a-2026-nba-game-on-nemotron)):
+
+- **A reasoning model needs its thinking turned off in a JSON pipeline.** With
+  it on, one call used the whole output budget and the job failed. With it off,
+  43 of 43 answers were usable JSON on the first try.
+- **It's fast and cheap.** The language model took 90 s for the whole game and
+  cost $0.0087. The whole job, from the file to 62 rendered clips, took
+  30.1 minutes, most of it transcription, reading the score bug and rendering.
+- **Titles still need the scoreboard.** The basketball title check found 37 of
+  57 titles named the wrong play or scorer, and fixed them by rewriting or
+  writing from the score bug. One wrong title still got through.
+- **The comparison with Gemma is still open.** The Gemma benchmark used a
+  different game, and the matching Nemotron replay wasn't run.
 
 ## What's next for Clips Kitty
 

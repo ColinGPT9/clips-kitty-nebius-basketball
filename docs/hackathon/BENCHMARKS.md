@@ -147,8 +147,8 @@ Colin should spot-check them by watching the clips.
 |---|---|
 | `gemma` (app run, job 1) | done, 2026-10-28: 6 clips in 88.8 min, below |
 | `gemma` (replay) | done, 2026-10-28: 7 clips, 14 calls, 56.8 min, below |
-| `nemotron` (replay) | _waiting for a Nebius key_ |
-| `gemma-nebius` (replay) | _waiting for a Nebius key_ |
+| `nemotron` (replay) | not run: one game on Nebius, by choice ([the live run](#live-run-a-2026-nba-game-on-nemotron) used a different game) |
+| `gemma-nebius` (replay) | not run: one game on Nebius, by choice |
 
 ### The app run: Gemma, the whole job (job 1)
 
@@ -224,11 +224,92 @@ and the run has no per-token cost.
 - **Against the app run:** the same six plays were picked again, each with a
   time overlap of at least 0.78, plus one more (clip 7). The game-winner fell
   from first to sixth of seven, and every title was written differently. So a
-  single run of one model can't separate two models on ranking or titles. The
-  Nemotron replay is run twice for that reason.
+  single run of one model can't separate two models on ranking or titles. A
+  Nemotron replay on this game should be run twice for that reason.
 - **Selection:** 2 of the 7 must-haves again (R6 and R13), and the same five are
   missed: R1, R2, R7, R9 and R14.
 - **Titles:** 1 right, 2 partly right, 4 wrong.
+
+## Live run: a 2026 NBA game on Nemotron
+
+**This is a different game from the 1995 benchmark above**, so it is not a
+like-for-like comparison with Gemma. It is the first time the pipeline ran on
+Nemotron through Nebius with a real key, from the file to rendered clips.
+
+### The game and the machine
+
+- **The game:** Toronto Raptors at Washington Wizards, 23 October 2026. A
+  42:49 extended-highlights upload of the broadcast, 720p60, with the score bug
+  on screen. It is NBA footage, so neither the video nor any clip is in this
+  repository or published anywhere. Only numbers and titles are reported here.
+- **The machine:** Colin's Windows PC, an RTX 3060 (12 GB), NVENC encoding.
+  Whisper `large-v3-turbo` ran on CUDA (512 segments). The score bug was read
+  564 times in 433 s and gave 77 baskets.
+- **The model:** `nebius/nvidia/Nemotron-3_5-Lightning`, $0.06 in and $0.24 out
+  per million tokens.
+
+### First attempt: thinking on, and the job failed
+
+The provider sent Nemotron's default, which is to think before answering. The
+first chunk-scoring call came back with `finish_reason: length`: Nemotron
+spent all 8,192 output tokens the app allows (`GENERATE_MAX_TOKENS`) thinking,
+and wrote no answer. The job stopped there.
+
+Three short checks on `nebius_check.py`'s 67-second prompt from the 1995 game:
+
+| Request | Seconds | Tokens out | Of which reasoning | Finish | Answer |
+|---|---|---|---|---|---|
+| Thinking on (the default) | 22.2 | 4,273 | 4,265 | stop | an empty clip list |
+| `reasoning_effort: "low"` | 34.1 | 8,192 | 8,192 | length | none |
+| `chat_template_kwargs: {"enable_thinking": false}` | 0.6 | 7 | 0 | stop | an empty clip list, valid JSON |
+
+With `reasoning_effort: "low"` the reasoning came back apart, in
+`reasoning_content`, not inline. It did not shorten the thinking.
+
+**The fix** (commit `5159a2a`): the Nebius provider now asks every `nvidia/`
+model to answer without thinking, through `chat_template_kwargs`
+(`_no_thinking` in `llm/providers/nebius.py`). Other Nebius models are sent
+exactly what they were before. `tests/test_nebius.py` checks both.
+
+### The replay: Nemotron on the saved evidence, thinking off
+
+`llm_bench.py replay` on the frozen inputs of the first attempt. Its JSON stays
+on Colin's PC, because its answers quote the broadcast's commentary.
+
+| Step | Calls | Usable JSON | Mean seconds per call |
+|---|---|---|---|
+| Chunk scoring | 11 | 11 | 1.7 |
+| Window scoring | 11 | 11 | 3.2 |
+| Rerank | 8 | 8 | 0.6 |
+| Titles | 8 | 8 | 2.4 |
+| Title check | 5 | 5 | 2.5 |
+| **Total** | **43** | **43** | **90 s of language model in 346 s** |
+
+- **Errors:** none. Every answer was read on the first try, in the strict
+  `json_schema` format the app asks for first.
+- **Time:** the other 256 s is the basketball window refinement, YOLO and the
+  OCR of the game clock, which doesn't use the language model.
+- **Tokens:** 64,846 in and 20,154 out. **Cost: $0.0087.**
+- **Clips:** 59.
+
+### The app run: the whole job, thinking off
+
+The real app, from the file to rendered clips, on the same PC.
+
+| Measure | Result |
+|---|---|
+| Time, end to end | 30.1 min |
+| Nemotron | 43 calls, 65,834 tokens in, 19,537 out, about $0.009 |
+| Clips | 62, rendered 1080×1920 with end cards |
+| E-BARD framing | 49 tracked, 12 assisted, 1 uncertain |
+| Basketball title check | 37 of 57 titles named the wrong play or scorer: 23 rewritten by Nemotron, 14 written from the scoreboard |
+
+- **The top clip** scored 90: "And-one Raptors lead by 15".
+- **Titles are the weak point.** The score bug caught most wrong titles, but not
+  all. "Bulls's Three Puts the Raptors Up 7" survived, in a Wizards game. Many of
+  the titles written from the scoreboard are plain, such as "Wizards trail by 4".
+- **Not judged yet:** no reference list of plays was written for this game, so
+  selection isn't scored against one. Colin hasn't watched the clips yet.
 
 <!-- RESULTS -->
 
@@ -253,6 +334,11 @@ NEBIUS_API_KEY=... python scripts/hackathon/llm_bench.py replay $F --backend neb
 python scripts/hackathon/llm_bench.py compare bench/runs/gemma.json bench/runs/nemotron.json bench/runs/gemma-nebius.json
 ```
 
+Nemotron is asked not to think automatically. The Nebius provider adds the
+switch for every `nvidia/` model, so these commands need nothing extra.
+
 The frozen inputs and every run's JSON (each call's step, time, JSON check, usage,
 the first 400 characters of its answer, and where each final title came from)
 go in `docs/hackathon/bench/` as each run finishes, so the tables can be checked.
+The NBA live run is the exception. Its frozen inputs and JSON hold the
+broadcast's commentary, so they stay off this repository.

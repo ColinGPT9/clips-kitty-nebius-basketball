@@ -62,6 +62,12 @@ The script does three things:
    fall back to. It reports whether each answer parsed and where the model's
    thinking came back.
 
+Nemotron is asked to answer without thinking (`chat_template_kwargs:
+{"enable_thinking": false}`), the same way a Basketball job asks it. With
+thinking on, it used all 8,192 output tokens thinking on one chunk of a game
+and answered nothing. See [BENCHMARKS.md](BENCHMARKS.md#live-run-a-2026-nba-game-on-nemotron).
+`--probe` sends the same switch.
+
 Use `--model` to try another Nemotron, for example
 `--model nvidia/Nemotron-3-Ultra-550b-a55b`.
 
@@ -154,8 +160,22 @@ On 2026-10-28, on a 4-core Linux container with no GPU (Python 3.11, CPU PyTorch
   above, started through `llm_bench.py serve`: ran end to end, from the file to six
   rendered 1080×1920 clips with E-BARD framing and captions, in 88.8 minutes.
   The clips are judged in [BENCHMARKS.md](BENCHMARKS.md#results).
-- **Not yet run with a live Nebius key:** options A, B and C on Nemotron. See the
-  status table in [BENCHMARKS.md](BENCHMARKS.md). This line is updated once
-  they have run.
 - **Option B on Windows** follows the app's existing from-source steps
   (README, "From source"). The steps are unchanged by this submission.
+
+Later on 2026-10-28, with a live Nebius key, on Colin's Windows PC (RTX 3060,
+Python 3.11, CUDA):
+
+- **Option A:** `nebius_check.py` listed the key's models and made one Nemotron
+  call. It answered, after 4,265 tokens of thinking. `--probe` was not run.
+- **Option C on Nemotron**, on a 43-minute 2026 NBA broadcast, started through
+  `llm_bench.py serve`. With thinking on, the first call ran out of room and
+  the job failed. With thinking off, the fix in `5159a2a`, it ran end to end in
+  30.1 minutes: 43 Nemotron calls, all usable, about $0.009, and 62 rendered
+  clips. The run is in
+  [BENCHMARKS.md](BENCHMARKS.md#live-run-a-2026-nba-game-on-nemotron).
+- **Offline:** `tests/test_nebius.py` (26 tests), and the tests the fix and the
+  code-scanning changes touch, passed.
+- **Not run:** option B (the desktop app's screens) on Nemotron, and the
+  Nemotron and Gemma-on-Nebius replays of the 1995 game. Colin ran one game on
+  Nebius, by choice.

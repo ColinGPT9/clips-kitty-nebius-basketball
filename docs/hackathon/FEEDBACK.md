@@ -35,7 +35,9 @@ model? Does a strict `json_schema` constrain the thinking or only the answer?
 Does `reasoning_effort` change Nemotron's behaviour? A short Nemotron-on-Nebius
 page would answer all three. Our provider handles each case (thinking apart,
 thinking inline in `<think>` tags, or none) because we could not tell which
-one we would get.
+one we would get. In the live run, the switch that worked was
+`chat_template_kwargs: {"enable_thinking": false}`, which Nebius doesn't
+document for Nemotron.
 
 **4. The model lifecycle moves fast for a production app.** Two of the five
 NVIDIA models in today's catalogue (`NVIDIA-Nemotron-3-Nano-30B-A3B`,
@@ -76,15 +78,26 @@ should match that advice.
 
 ## Part 2: live runs
 
-These will be added from the first runs with a key, and only with what was
-measured: `nebius_check.py --probe`, then the benchmark replays.
+Measured on 2026-10-28 with `nvidia/Nemotron-3_5-Lightning`, on one 43-minute
+NBA broadcast and the short `nebius_check.py` prompt. Only the strict
+`json_schema` format was used, because it never failed. The full run is in
+[BENCHMARKS.md](BENCHMARKS.md#live-run-a-2026-nba-game-on-nemotron).
 
-- Which of the three response formats each Nemotron model accepted, and
-  whether the answer parsed: _not yet measured_.
-- Where the thinking came back (apart, inline, or none): _not yet measured_.
-- Latency and tokens per Basketball step, compared with Gemma: _not yet
-  measured_. See [BENCHMARKS.md](BENCHMARKS.md).
-- Rate limits hit on a full game, if any: _not yet measured_.
+- **Thinking on by default, and unbounded.** On the first chunk of the game,
+  Nemotron spent all 8,192 output tokens the app allows on thinking and
+  answered nothing (`finish_reason: length`). The job failed.
+- **Where the thinking came back:** apart, in `reasoning_content`, not inline.
+- **`reasoning_effort: "low"` didn't shorten it.** On the short prompt it
+  still used all 8,192 tokens thinking (34.1 s).
+- **`chat_template_kwargs: {"enable_thinking": false}` works.** The short
+  prompt took 0.6 s and 7 tokens, with no reasoning. The app now sends it to
+  every NVIDIA model on Nebius.
+- **Structured output:** with thinking off, the strict `json_schema` format was
+  accepted and all 43 answers in the game parsed, with no fallback.
+- **Latency and tokens:** 90 s of language model for the whole game,
+  64,846 tokens in and 20,154 out, $0.0087. It isn't compared with Gemma here,
+  because the Gemma benchmark used a different game.
+- **Rate limits:** none hit in 43 calls.
 - Onboarding: account, $1 trial credit, card requirement, time to the first
   successful call: _to be noted by Colin when he creates the key_.
 
