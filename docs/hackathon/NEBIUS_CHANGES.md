@@ -75,7 +75,6 @@ shows no change under these paths.
 The Basketball code never names a provider or a model (`grep -rn "nebius\|nemotron" sports/`
 finds nothing). A job gets whatever backend `llm.backend` names, through
 `llm/registry.create_backend`, behind the one `LLMBackend` interface
-(`llm/base.py`). Adding Meta's models later is another catalogue entry, such as the
-existing `meta` provider (Muse Spark), which is already in the catalogue. Nebius
-also lists `meta-models/muse-spark-open`, so it can be selected on the same
-Nebius key with no code at all.
+(`llm/base.py`). Adding another model is another catalogue entry in
+`llm/providers/catalog.py`, and any other model Nebius lists can be selected on
+the same Nebius key with no code at all.

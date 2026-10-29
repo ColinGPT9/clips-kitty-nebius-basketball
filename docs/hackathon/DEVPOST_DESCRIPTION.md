@@ -149,8 +149,7 @@ Measured on one 43-minute NBA broadcast, on an RTX 3060
 ## What's next for Clips Kitty
 
 Clips Kitty will stay free and open source. The provider architecture is meant
-to take the next model without a computer-vision rebuild, and that is next:
-Meta's models for the Meta Global AI Developer Hackathon. After that come better
+to take the next model without a computer-vision rebuild. After that come better
 reactions from the picture, and NBA-style score bugs on more broadcasts.
 
 ---
