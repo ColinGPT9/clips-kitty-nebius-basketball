@@ -279,9 +279,9 @@ def _title_origin(meta, first, fallback) -> str:
 
 
 def cmd_replay(args) -> int:
+    import core.pipeline as pipeline
     from analysis.fusion import find_clips
     from analysis.metadata import generate_metadata_batch
-    from core.pipeline import _refine_windows
     from llm.providers import usage
 
     frozen = pickle.loads(Path(args.frozen).read_bytes())
@@ -306,14 +306,13 @@ def cmd_replay(args) -> int:
     # A clip direction is parsed by the language model too, so it is parsed
     # again with this backend rather than reused from the capture.
     kwargs.pop("intent", None)
-    from core.pipeline import clip_direction
 
-    intent = clip_direction(job_config, llm, video.duration)
+    intent = pipeline.clip_direction(job_config, llm, video.duration)
     if intent is not None:
         kwargs["intent"] = intent
     candidates, rejections = find_clips(video_path, frozen["segments"], llm, config, *frozen["args"], **kwargs)
     found_s = time.monotonic() - started
-    candidates = _refine_windows(sport, candidates, video, frozen["segments"], job_config)
+    candidates = pipeline._refine_windows(sport, candidates, video, frozen["segments"], job_config)
     refined_s = time.monotonic() - started - found_s
     metas, first = [], []
     if candidates:
@@ -421,8 +420,8 @@ def _ts(seconds: float) -> str:
 def cmd_compare(args) -> int:
     runs = [json.loads(Path(p).read_text(encoding="utf-8")) for p in args.runs]
     prices = _prices()
-    lines = ["| Run | Backend | Clips | LLM calls | Usable JSON | Errors | LLM time (s) | Total (s) "
-             "| Tokens in / out | Cost (USD) |", "|---|---|---|---|---|---|---|---|---|---|"]
+    lines = [("| Run | Backend | Clips | LLM calls | Usable JSON | Errors | LLM time (s) | Total (s) "
+              "| Tokens in / out | Cost (USD) |"), "|---|---|---|---|---|---|---|---|---|---|"]
     for run in runs:
         calls = run["calls"]
         ok = sum(1 for c in calls if c.get("json_ok"))

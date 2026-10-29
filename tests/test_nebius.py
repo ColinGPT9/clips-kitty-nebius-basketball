@@ -227,6 +227,16 @@ def test_a_clip_request_is_held_to_the_schema_and_billed_usage_is_counted(env):
                                              "(240 reasoning)")
 
 
+def test_nemotron_is_asked_to_answer_without_thinking_and_other_models_are_left_alone(env):
+    # Live, October 2026: with thinking on, Nemotron 3.5 Lightning spent all 8,192
+    # output tokens thinking on one chunk of a game and the job failed.
+    env.save_key()
+    generate_json(env.backend(), "pick the basketball moments", CLIPS_SCHEMA)
+    assert env.requests[-1]["json"]["chat_template_kwargs"] == {"enable_thinking": False}
+    generate_json(env.backend("google/gemma-3-27b-it"), "pick the basketball moments", CLIPS_SCHEMA)
+    assert "chat_template_kwargs" not in env.requests[-1]["json"]
+
+
 @pytest.mark.parametrize("content", [
     '<think>The crowd noise at {12s} suggests a three.</think>\n' + CLIPS,
     'Costello is open, the score goes {58-57}.</think>' + CLIPS,  # the template opened <think> itself

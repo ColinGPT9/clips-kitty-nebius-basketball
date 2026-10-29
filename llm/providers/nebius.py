@@ -80,6 +80,16 @@ def _lines(pricing: dict) -> tuple[tuple[str, float, str, bool], ...]:
     return tuple(lines)
 
 
+def _no_thinking(body: dict) -> dict:
+    # Nemotron reasons before it answers unless told not to, and on a five-minute
+    # chunk of commentary it spent all 8,192 output tokens thinking (October 2026;
+    # reasoning_effort "low" didn't shorten it). The chat template's switch
+    # turns it off, so the answer is the JSON itself, as with Gemma.
+    if str(body.get("model", "")).lower().startswith("nvidia/"):
+        return {**body, "chat_template_kwargs": {"enable_thinking": False}}
+    return body
+
+
 def _int(value) -> int:
     try:
         return int(value or 0)
@@ -98,6 +108,7 @@ SPEC = ProviderSpec(
     privacy="Transcripts and prompts are sent to Nebius Token Factory with your key.",
     models_path="/models?verbose=true",
     model_filter=model_info,
+    body_extras=_no_thinking,
     tagline="Open models on Nebius, including NVIDIA Nemotron.",
     # Nemotron 3.5 Lightning: NVIDIA's open model, the cheapest Nemotron Nebius
     # lists ($0.06 / $0.24 per million tokens, October 2026) and among its
