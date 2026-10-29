@@ -143,7 +143,14 @@ high-school game.
 |---|---|---|---|---|
 | Gemma (`gemma:7b`, local, 4-core CPU), app run | 2 of 7 | 2 of 6 | about 60 min | none (local) |
 | Gemma, replay on the same evidence | 2 of 7 | 1 of 7, 2 partly | 56.8 min | none (local) |
-| Nemotron 3.5 Lightning (Nebius), replay | not run yet | | | |
+| Nemotron 3.5 Lightning (Nebius), replay | 3 of 7 | 4 of 9, 4 partly | 30 s | $0.0032 |
+| Nemotron, second replay | 3 of 7 | 4 of 9, 5 partly | 35 s | $0.0034 |
+
+Nemotron found the last three seconds and the court storm, which Gemma missed
+both times, and it never gave the game to the wrong team. Its title mistakes were
+details, such as the time left on the game-winner. Both models missed the same
+four early plays. Gemma's time is a 4-core CPU with no GPU, so the comparison
+shows what a creator without a GPU gains, not which model is faster.
 
 Method, reference plays and every clip are in
 **[docs/hackathon/BENCHMARKS.md](docs/hackathon/BENCHMARKS.md)**.
@@ -217,14 +224,6 @@ Nemotron with thinking off, the reasoning-model handling and usage reporting in
 the shared adapter, the benchmark harness and the check script, the guards that
 stop this copy publishing over the original's image or website, and this
 documentation.
-
-## Future development
-
-The language model sits behind one interface, and a provider is one entry in a
-catalogue (`llm/providers/catalog.py`). Next is Meta's models for the Meta
-Global AI Developer Hackathon: the catalogue already has Meta's own API (Muse
-Spark), and Nebius lists `meta-models/muse-spark-open` on the same key. No
-Meta-specific work was done here.
 
 ## Licensing
 

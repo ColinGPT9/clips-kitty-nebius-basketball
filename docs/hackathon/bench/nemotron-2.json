@@ -1,0 +1,899 @@
+{
+ "label": "nemotron-2",
+ "backend": "nebius/nvidia/Nemotron-3_5-Lightning",
+ "video": {
+  "title": "Belmont Marauders vs Salem Witches, boys varsity basketball, 1995 (final 22 minutes)",
+  "video_id": "local_1144e6ee30c4",
+  "path": "D:\\clips_research\\nebius\\bench1995\\belmont-salem-1995-final.mp4"
+ },
+ "frozen": "D:\\clips_research\\nebius\\repo\\docs\\hackathon\\bench\\local_1144e6ee30c4.pkl",
+ "frozen_saved_at": "2026-10-28T10:09:19+0000",
+ "seconds": {
+  "find_clips": 27.7,
+  "refine_windows": 0.0,
+  "total": 36.0
+ },
+ "clips": [
+  {
+   "start": 1250.26,
+   "end": 1279.78,
+   "score": 90,
+   "hook": "Okay, here we go, the quarterback gets it in, bounce, and it's not going to do it",
+   "reason": "The build-up of anticipation followed by the decisive 'Salem wins it' call creates a perfect narrative arc for virality.",
+   "source": "transcript",
+   "moment": "Game winner",
+   "subscores": {
+    "text": 90,
+    "audio": 48,
+    "visual": 82,
+    "reaction": 50,
+    "engagement": 88,
+    "source": "transcript",
+    "game": 20,
+    "sport_event": "game_winner",
+    "sport_label": "Game winner",
+    "sport_t": 1264.6,
+    "sport_group": 9,
+    "sport_why": "crowd roar 2s; said \"wins it\"; said \"ball game\"",
+    "sport_bonus": 13,
+    "rerank_position": 2
+   },
+   "title": "Marauders charge the court Salem wins the ball game",
+   "description": "Marauders were upset after Salem won the game with no shot taken. Players charged the court following the final buzzer.",
+   "hashtags": [
+    "#basketball",
+    "#1995",
+    "#final"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 1118.0,
+   "end": 1145.49,
+   "score": 80,
+   "hook": "No one covering the ball out of bounds and they get it in bounds to Kamah",
+   "reason": "The transcript explicitly calls this a game-winning move ('They may have won') with zero time left and no timeouts; this is a classic buzzer-beater scenario with maximum narrative payoff.",
+   "source": "signal",
+   "moment": "Big moment",
+   "subscores": {
+    "text": 88,
+    "audio": 51,
+    "visual": 72,
+    "reaction": 50,
+    "engagement": 92,
+    "source": "signal",
+    "game": 46,
+    "game_why": "GAME SOUND: a crowd cheering (3s)",
+    "game_bonus": 2,
+    "sport_event": "big_moment",
+    "sport_label": "Big moment",
+    "sport_t": 1122.0,
+    "sport_group": 7,
+    "sport_why": "crowd roar 4s",
+    "sport_bonus": 4,
+    "rerank_position": 3
+   },
+   "title": "Kamah shake bakes in bounds shot",
+   "description": "Kamah received the inbound pass, shook the defender, and scored. Marauders had no timeouts left with one second remaining.",
+   "hashtags": [
+    "#inbounds",
+    "#buzzerbeater",
+    "#marauders"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 820.52,
+   "end": 835.52,
+   "score": 76,
+   "hook": "Marauders needed a timeout to regroup. 59-58 Witches by one and getting your money's worth tonight if you pay to get in.",
+   "reason": "A tension-filled timeout call in a one-possession game late in the fourth quarter, perfect setup for the final chaotic possessions.",
+   "source": "transcript",
+   "moment": "Defensive stop",
+   "subscores": {
+    "text": 88,
+    "audio": 46,
+    "visual": 69,
+    "reaction": 50,
+    "engagement": 85,
+    "source": "transcript",
+    "game": 26,
+    "game_why": "GAME SOUND: a crowd cheering",
+    "sport_event": "defensive_stop",
+    "sport_label": "Defensive stop",
+    "sport_t": 830.5,
+    "sport_group": 5,
+    "sport_why": "crowd roar 2s; said \"turnover\"; said \"fouled\"",
+    "sport_bonus": 7,
+    "rerank_position": 5
+   },
+   "title": "Marauders by one closing in on minute",
+   "description": "Marauders led 58-57 with closing minutes remaining. Penn committed a turnover with no fouls called.",
+   "hashtags": [
+    "#moneytime",
+    "#turnover",
+    "#onepoint"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 1205.0,
+   "end": 1229.56,
+   "score": 73,
+   "hook": "They have three seconds left. Either way this one goes",
+   "reason": "End-of-game drama with three seconds remaining; the announcer builds immense tension around the Marauders' chance to avoid a turnover, making it a highly engaging finish despite the lack of a specific score result in the text.",
+   "source": "signal",
+   "moment": "Game end",
+   "subscores": {
+    "text": 78,
+    "audio": 43,
+    "visual": 54,
+    "reaction": 50,
+    "engagement": 80,
+    "source": "signal",
+    "game": 45,
+    "game_why": "GAME SOUND: a crowd cheering",
+    "game_bonus": 1,
+    "sport_event": "game_end",
+    "sport_label": "Game end",
+    "sport_t": 1217.6,
+    "sport_group": 8,
+    "sport_why": "crowd roar 2s; said \"foul\"; said \"ball game\"",
+    "sport_bonus": 5,
+    "rerank_position": 1
+   },
+   "title": "Maurders have three seconds left",
+   "description": "Maurders had three seconds remaining to attempt a game-tying or winning shot. Both teams played an outstanding game.",
+   "hashtags": [
+    "#3seconds",
+    "#bitterpill",
+    "#outstanding"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 767.3,
+   "end": 808.54,
+   "score": 71,
+   "hook": "and over the back on Christensen.",
+   "reason": "A clear foul call mid-game that shifts momentum and sets up a critical free throw situation.",
+   "source": "transcript",
+   "moment": "Crowd reaction",
+   "subscores": {
+    "text": 82,
+    "audio": 51,
+    "visual": 44,
+    "reaction": 50,
+    "engagement": 78,
+    "source": "transcript",
+    "game": 18,
+    "sport_event": "crowd_reaction",
+    "sport_label": "Crowd reaction",
+    "sport_t": 788.9,
+    "sport_group": 4,
+    "sport_why": "cut away from the court; crowd roar",
+    "sport_bonus": 8,
+    "rerank_position": 6
+   },
+   "title": "Kamal money free throw",
+   "description": "Controversial call sent Kamal to the free throw line. Kamah made the money free throw possibly avoiding additional pressure.",
+   "hashtags": [
+    "#freethrow",
+    "#kamal",
+    "#controversial"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 885.0,
+   "end": 908.87,
+   "score": 71,
+   "hook": "He hits it here. will be interesting if Salem waits for one",
+   "reason": "Mid-game clutch context with a one-possession score (59-58) and a timeout battle creates strong tension; the crowd is fully engaged, making this a high-potential hype moment.",
+   "source": "signal",
+   "moment": "Crowd reaction",
+   "subscores": {
+    "text": 72,
+    "audio": 47,
+    "visual": 60,
+    "reaction": 50,
+    "engagement": 78,
+    "source": "signal",
+    "game": 52,
+    "game_why": "GAME SOUND: a crowd cheering (20s)",
+    "game_bonus": 2,
+    "sport_event": "crowd_reaction",
+    "sport_label": "Crowd reaction",
+    "sport_t": 897.3,
+    "sport_group": 6,
+    "sport_why": "cut away from the court; crowd roar",
+    "sport_bonus": 8,
+    "rerank_position": 4
+   },
+   "title": "Marauders needed timeout to regroup",
+   "description": "Marauders called timeout after Salem attempted to ice them. Score was 59-58 Witches leading.",
+   "hashtags": [
+    "#timeout",
+    "#regroup",
+    "#5958"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 235.87,
+   "end": 254.73,
+   "score": 64,
+   "hook": "Marauders now 4-10 left inside to Downes wild shot and LaPierre is oh goodness",
+   "reason": "Immediate crowd reaction and exclamation of a missed shot creates instant engagement and tension.",
+   "source": "transcript",
+   "moment": "Charge taken",
+   "subscores": {
+    "text": 70,
+    "audio": 56,
+    "visual": 34,
+    "reaction": 50,
+    "engagement": 68,
+    "source": "transcript",
+    "game": 28,
+    "game_why": "GAME SOUND: a crowd cheering",
+    "sport_event": "charge",
+    "sport_label": "Charge taken",
+    "sport_t": 248.6,
+    "sport_group": 1,
+    "sport_why": "crowd roar 2s; said \"foul\"; said \"foul\"",
+    "sport_bonus": 8,
+    "rerank_position": 8
+   },
+   "title": "Downes wild shot trash referee call",
+   "description": "Downes went strong to the basket. Matt tried to take the charge. Referee let the play go, calling it trash.",
+   "hashtags": [
+    "#referee",
+    "#charge",
+    "#downes"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 280.39,
+   "end": 307.39,
+   "score": 64,
+   "hook": "There's not a towel in the gymnasium",
+   "reason": "The ref pulling out a Kleenex to wipe the ball is a quirky, viral-worthy visual that breaks the intensity of a close game; the crowd reaction and absurdity make it a strong short-form filler.",
+   "source": "transcript",
+   "moment": "And-one",
+   "subscores": {
+    "text": 65,
+    "audio": 50,
+    "visual": 31,
+    "reaction": 50,
+    "engagement": 60,
+    "source": "transcript",
+    "game": 23,
+    "game_why": "GAME SOUND: a crowd cheering",
+    "sport_event": "and_one",
+    "sport_label": "And-one",
+    "sport_t": 300.0,
+    "sport_group": 2,
+    "sport_why": "crowd roar 2s; said \"pull up\"; said \"fouled\"",
+    "sport_bonus": 11,
+    "rerank_position": 7
+   },
+   "title": "Ref uses Kleenex instead of towel",
+   "description": "Gym had no towels. Ref pulled out a Kleenex to clean the ball. Doug was told to keep eyes on Kamal's middle.",
+   "hashtags": [
+    "#kleenex",
+    "#gym",
+    "#doug"
+   ],
+   "title_origin": "model"
+  },
+  {
+   "start": 407.72,
+   "end": 423.44,
+   "score": 61,
+   "hook": "think about the clock a little bit. Belmont never really runs down a stall offense. They'll look to score here on this possession but they will be very careful",
+   "reason": "Builds anticipation for a steal, which pays off immediately after the window ends. High engagement due to the immediate payoff, though the window itself is setup dialogue.",
+   "source": "signal",
+   "moment": "Steal",
+   "subscores": {
+    "text": 40,
+    "audio": 62,
+    "visual": 56,
+    "reaction": 50,
+    "engagement": 45,
+    "source": "signal",
+    "game": 44,
+    "game_why": "GAME SOUND: a crowd cheering (5s)",
+    "game_bonus": 1,
+    "sport_event": "steal",
+    "sport_label": "Steal",
+    "sport_t": 412.7,
+    "sport_group": 3,
+    "sport_why": "crowd roar 2s; said \"foul\"; said \"free throws\"",
+    "sport_bonus": 10
+   },
+   "title": "Stolen out of Conley's hands by Penn",
+   "description": "Belmont carefully looks to score as Conley has trouble keeping up with Penn's quickness.",
+   "hashtags": [
+    "#basketball",
+    "#highschool",
+    "#1995"
+   ],
+   "title_origin": "model"
+  }
+ ],
+ "rejections": [
+  {
+   "start": 1095.22,
+   "end": 1111.04,
+   "score": 71,
+   "reason": "no_moment"
+  },
+  {
+   "start": 722.53,
+   "end": 779.78,
+   "score": 66,
+   "reason": "no_moment"
+  },
+  {
+   "start": 984.69,
+   "end": 1030.36,
+   "score": 72,
+   "reason": "no_moment"
+  },
+  {
+   "start": 564.26,
+   "end": 612.05,
+   "score": 66,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1147.25,
+   "end": 1161.09,
+   "score": 64,
+   "reason": "no_moment"
+  },
+  {
+   "start": 646.37,
+   "end": 695.21,
+   "score": 63,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1162.63,
+   "end": 1205.64,
+   "score": 62,
+   "reason": "no_moment"
+  },
+  {
+   "start": 798.02,
+   "end": 822.96,
+   "score": 61,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1231.02,
+   "end": 1252.18,
+   "score": 64,
+   "reason": "no_moment"
+  },
+  {
+   "start": 23.5,
+   "end": 43.84,
+   "score": 63,
+   "reason": "no_moment"
+  },
+  {
+   "start": 523.22,
+   "end": 549.9,
+   "score": 59,
+   "reason": "no_moment"
+  },
+  {
+   "start": 510.6,
+   "end": 567.74,
+   "score": 60,
+   "reason": "no_moment"
+  },
+  {
+   "start": 814.14,
+   "end": 841.8,
+   "score": 71,
+   "reason": "same_moment"
+  },
+  {
+   "start": 118.98,
+   "end": 175.76,
+   "score": 59,
+   "reason": "no_moment"
+  },
+  {
+   "start": 490.72,
+   "end": 510.04,
+   "score": 62,
+   "reason": "no_moment"
+  },
+  {
+   "start": 842.44,
+   "end": 865.34,
+   "score": 64,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1296.68,
+   "end": 1311.44,
+   "score": 66,
+   "reason": "no_moment"
+  },
+  {
+   "start": 163.66,
+   "end": 184.44,
+   "score": 58,
+   "reason": "no_moment"
+  },
+  {
+   "start": 348.16,
+   "end": 365.0,
+   "score": 59,
+   "reason": "no_moment"
+  },
+  {
+   "start": 243.91,
+   "end": 266.34,
+   "score": 60,
+   "reason": "same_moment"
+  },
+  {
+   "start": 441.14,
+   "end": 486.24,
+   "score": 50,
+   "reason": "no_moment"
+  },
+  {
+   "start": 417.0,
+   "end": 439.94,
+   "score": 51,
+   "reason": "no_moment"
+  },
+  {
+   "start": 8.5,
+   "end": 23.5,
+   "score": 38,
+   "reason": "no_moment"
+  },
+  {
+   "start": 609.0,
+   "end": 624.71,
+   "score": 41,
+   "reason": "no_moment"
+  },
+  {
+   "start": 619.0,
+   "end": 637.11,
+   "score": 40,
+   "reason": "no_moment"
+  },
+  {
+   "start": 703.0,
+   "end": 721.65,
+   "score": 50,
+   "reason": "no_moment"
+  },
+  {
+   "start": 908.0,
+   "end": 923.01,
+   "score": 38,
+   "reason": "no_moment"
+  },
+  {
+   "start": 924.5,
+   "end": 943.85,
+   "score": 37,
+   "reason": "no_moment"
+  },
+  {
+   "start": 960.0,
+   "end": 976.77,
+   "score": 46,
+   "reason": "no_moment"
+  },
+  {
+   "start": 970.0,
+   "end": 990.85,
+   "score": 45,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1044.0,
+   "end": 1072.0,
+   "score": 51,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1310.5,
+   "end": 1325.5,
+   "score": 37,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1319.0,
+   "end": 1334.0,
+   "score": 27,
+   "reason": "no_moment"
+  },
+  {
+   "start": 53.0,
+   "end": 73.03,
+   "score": 60,
+   "reason": "no_moment"
+  },
+  {
+   "start": 97.0,
+   "end": 112.58,
+   "score": 33,
+   "reason": "no_moment"
+  },
+  {
+   "start": 200.0,
+   "end": 216.36,
+   "score": 50,
+   "reason": "no_moment"
+  },
+  {
+   "start": 206.0,
+   "end": 225.3,
+   "score": 41,
+   "reason": "no_moment"
+  },
+  {
+   "start": 221.0,
+   "end": 242.91,
+   "score": 39,
+   "reason": "no_moment"
+  },
+  {
+   "start": 269.0,
+   "end": 284.67,
+   "score": 27,
+   "reason": "no_moment"
+  },
+  {
+   "start": 322.0,
+   "end": 337.0,
+   "score": 51,
+   "reason": "no_moment"
+  },
+  {
+   "start": 385.0,
+   "end": 404.52,
+   "score": 60,
+   "reason": "no_moment"
+  },
+  {
+   "start": 632.0,
+   "end": 649.87,
+   "score": 37,
+   "reason": "no_moment"
+  },
+  {
+   "start": 711.0,
+   "end": 727.43,
+   "score": 38,
+   "reason": "no_moment"
+  },
+  {
+   "start": 944.0,
+   "end": 959.29,
+   "score": 44,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1083.0,
+   "end": 1099.14,
+   "score": 44,
+   "reason": "no_moment"
+  },
+  {
+   "start": 337.0,
+   "end": 353.1,
+   "score": 58,
+   "reason": "no_moment"
+  },
+  {
+   "start": 1250.26,
+   "end": 1279.78,
+   "score": 70,
+   "reason": "same_moment"
+  },
+  {
+   "start": 1111.68,
+   "end": 1127.0,
+   "score": 71,
+   "reason": "same_moment"
+  }
+ ],
+ "calls": [
+  {
+   "stage": "chunk scoring",
+   "kind": "generate",
+   "prompt_chars": 9864,
+   "seconds": 2.12,
+   "answer_chars": 1523,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 23.5, \"end\": 29.5, \"score\": 82, \"engagement\": 78, \"trending\": false, \"hook\": \"He can pull up from that s on the beacons watch the little skip move there it is going up and he goes in the paint\", \"reason\": \"High-tempo build-up to a score, featuring a skilled move and a basket, keeping the energy high in a close game.\"}, {\"start\": 119.0, \"end\": 123.0, \"score\": 78, \"engagement\": ",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 3084,
+     "completion_tokens": 468,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "chunk scoring",
+   "kind": "generate",
+   "prompt_chars": 10025,
+   "seconds": 2.48,
+   "answer_chars": 1784,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 523.2, \"end\": 548.6, \"score\": 82, \"engagement\": 78, \"trending\": false, \"hook\": \"He was triple team... No one was helping him out\", \"reason\": \"Critical late-game turnover with two minutes left and a one-point lead; the commentary highlights the struggle and tactical failure, making it a high-tension, quotable clip that captures a pivotal game shift.\"}, {\"start\": 490.7, \"end\": 5",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 3183,
+     "completion_tokens": 528,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "chunk scoring",
+   "kind": "generate",
+   "prompt_chars": 10276,
+   "seconds": 2.45,
+   "answer_chars": 1884,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 510.6, \"end\": 567.7, \"score\": 82, \"engagement\": 82, \"trending\": false, \"hook\": \"They got Scooney on a foul there that could be number four\", \"reason\": \"Late game tension with a two-minute mark approaching, a critical foul situation, and immediate crowd/stakes reaction as the commentators dissect the pressure moment.\"}, {\"start\": 567.7, \"end\": 645.5, \"score\": 88, \"engagement\": ",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 3242,
+     "completion_tokens": 532,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "chunk scoring",
+   "kind": "generate",
+   "prompt_chars": 9206,
+   "seconds": 2.14,
+   "answer_chars": 1528,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 765.5, \"end\": 830.5, \"score\": 82, \"engagement\": 78, \"trending\": false, \"hook\": \"and over the back on Christensen.\", \"reason\": \"A clear foul call mid-game that shifts momentum and sets up a critical free throw situation.\"}, {\"start\": 824.1, \"end\": 912.0, \"score\": 88, \"engagement\": 85, \"trending\": false, \"hook\": \"Marauders needed a timeout to regroup. 59-58 Witches by one and ge",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 3024,
+     "completion_tokens": 486,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "chunk scoring",
+   "kind": "generate",
+   "prompt_chars": 10674,
+   "seconds": 2.24,
+   "answer_chars": 1654,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 1066.4, \"end\": 1121.0, \"score\": 92, \"engagement\": 85, \"trending\": false, \"hook\": \"And if Penn takes the ball out of bounds Doug, he's getting it right back\", \"reason\": \"This clip delivers a strategic insight immediately followed by the dramatic inbounds play with under 10 seconds left, scoring high on setup and payoff.\"}, {\"start\": 1260.1, \"end\": 1275.1, \"score\": 90, \"engageme",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 3613,
+     "completion_tokens": 499,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "chunk scoring",
+   "kind": "generate",
+   "prompt_chars": 5342,
+   "seconds": 0.88,
+   "answer_chars": 352,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 1293.5, \"end\": 1311.4, \"score\": 78, \"engagement\": 75, \"trending\": false, \"hook\": \"Absolutely a scoony pen, a great basketball player.\", \"reason\": \"Strong end-of-game reaction and player praise following a close loss, hooking with the announcer's enthusiasm and providing a satisfying emotional payoff as the season is reviewed.\"}]}",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 1520,
+     "completion_tokens": 105,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "window scoring",
+   "kind": "generate",
+   "prompt_chars": 5175,
+   "seconds": 3.11,
+   "answer_chars": 2566,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 417.0, \"end\": 439.0, \"score\": 55, \"engagement\": 45, \"hook\": \"careful. And it's stolen right out of the hands of Doug Conley\", \"reason\": \"A steal leading to free throws in a tight game; the context of 'having a tough time' and the late-game fouling situation provides decent drama, though the play itself is a routine foul rather than a highlight-reel action.\"}, {\"start\": 885.0, ",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 1412,
+     "completion_tokens": 754,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "window scoring",
+   "kind": "generate",
+   "prompt_chars": 4368,
+   "seconds": 3.33,
+   "answer_chars": 2828,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 908.0, \"end\": 919.0, \"score\": 15, \"engagement\": 20, \"hook\": \"Marauders needed a timeout to regroup\", \"reason\": \"Late game context (59-58, 37 seconds left) provides slight relevance, but the content is purely strategic coaching discussion with no action or decisive shot, making it dull for a highlight clip.\"}, {\"start\": 924.5, \"end\": 935.5, \"score\": 10, \"engagement\": 15, \"hook\"",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 1204,
+     "completion_tokens": 810,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "window scoring",
+   "kind": "generate",
+   "prompt_chars": 4426,
+   "seconds": 3.91,
+   "answer_chars": 2828,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 97.0, \"end\": 108.0, \"score\": 15, \"engagement\": 20, \"hook\": \"you know, we like to think that basketball is going to be a team game\", \"reason\": \"Generic early-game commentary on spacing; no action or clear event described, just a coaching philosophy observation.\"}, {\"start\": 200.0, \"end\": 211.0, \"score\": 55, \"engagement\": 60, \"hook\": \"Alright Marauders 4-20 left to go in regulat",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 1204,
+     "completion_tokens": 826,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "window scoring",
+   "kind": "generate",
+   "prompt_chars": 3525,
+   "seconds": 2.5,
+   "answer_chars": 1559,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 711.0, \"end\": 722.0, \"score\": 20, \"engagement\": 15, \"hook\": \"Marauders can't turn it over here\", \"reason\": \"Late-game context is missing; this is routine strategic commentary about avoiding a trap, not a decisive play or reaction.\"}, {\"start\": 944.0, \"end\": 955.0, \"score\": 35, \"engagement\": 30, \"hook\": \"I think you got it. It's not an intentional foul\", \"reason\": \"Commentary d",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 967,
+     "completion_tokens": 471,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "window scoring",
+   "kind": "generate",
+   "prompt_chars": 3072,
+   "seconds": 1.33,
+   "answer_chars": 738,
+   "json_ok": true,
+   "answer_head": "{\"clips\": [{\"start\": 1250.3, \"end\": 1279.8, \"score\": 55, \"engagement\": 65, \"hook\": \"Adam, you got Lapierre here in the front court\", \"reason\": \"Late-game drama with Salem winning the ball game and Marauders charging the court provides strong context, but the play description is ordinary front-court action rather than a highlight-reel play like a dunk or buzzer-beater.\"}, {\"start\": 1111.7, \"end\": 1",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 855,
+     "completion_tokens": 220,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "rerank",
+   "kind": "generate",
+   "prompt_chars": 3905,
+   "seconds": 0.64,
+   "answer_chars": 35,
+   "json_ok": true,
+   "answer_head": "{\"order\": [5, 0, 1, 4, 2, 3, 7, 6]}",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 1145,
+     "completion_tokens": 28,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "titles",
+   "kind": "generate",
+   "prompt_chars": 4668,
+   "seconds": 2.55,
+   "answer_chars": 1955,
+   "json_ok": true,
+   "answer_head": "{\"items\": [{\"index\": 0, \"title\": \"Marauders charge the court Salem wins the ball game\", \"description\": \"Marauders were upset after Salem won the game with no shot taken. Players charged the court following the final buzzer.\", \"hashtags\": [\"#basketball\", \"#1995\", \"#final\"]}, {\"index\": 1, \"title\": \"Kamah shake bakes in bounds shot\", \"description\": \"Kamah received the inbound pass, shook the defender",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 1215,
+     "completion_tokens": 564,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  },
+  {
+   "stage": "titles",
+   "kind": "generate",
+   "prompt_chars": 1885,
+   "seconds": 5.69,
+   "answer_chars": 5351,
+   "json_ok": true,
+   "answer_head": "{\"items\": [{\"index\": 0, \"title\": \"Stolen out of Conley's hands by Penn\", \"description\": \"Belmont carefully looks to score as Conley has trouble keeping up with Penn's quickness.\", \"hashtags\": [\"#basketball\", \"#highschool\", \"#1995\"]}, {\"index\": 1, \"title\": \"Coulter takes the lead early\", \"description\": \"Coulter puts points on the board for Salem, giving them an early advantage.\", \"hashtags\": [\"#bas",
+   "usage": {
+    "nebius/nvidia/Nemotron-3_5-Lightning": {
+     "calls": 1,
+     "prompt_tokens": 490,
+     "completion_tokens": 1472,
+     "cached_tokens": 0,
+     "reasoning_tokens": 0
+    }
+   }
+  }
+ ],
+ "usage": {
+  "nebius/nvidia/Nemotron-3_5-Lightning": {
+   "calls": 14,
+   "prompt_tokens": 26158,
+   "completion_tokens": 7763,
+   "cached_tokens": 0,
+   "reasoning_tokens": 0
+  }
+ },
+ "sport_report": {
+  "sport": "Basketball",
+  "highlights": "best",
+  "period": "full",
+  "found": {
+   "Charge taken": 1,
+   "And-one": 1,
+   "Steal": 1,
+   "Crowd reaction": 2,
+   "Defensive stop": 1,
+   "Game end": 1,
+   "Game winner": 1
+  },
+  "big_moments": 1,
+  "replays_grouped": 0,
+  "score": "",
+  "scoreboard": false,
+  "footage": "sideline",
+  "clips": 9,
+  "notes": []
+ }
+}

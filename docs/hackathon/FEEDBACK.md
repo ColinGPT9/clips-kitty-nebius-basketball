@@ -95,8 +95,10 @@ NBA broadcast and the short `nebius_check.py` prompt. Only the strict
 - **Structured output:** with thinking off, the strict `json_schema` format was
   accepted and all 43 answers in the game parsed, with no fallback.
 - **Latency and tokens:** 90 s of language model for the whole game,
-  64,846 tokens in and 20,154 out, $0.0087. It isn't compared with Gemma here,
-  because the Gemma benchmark used a different game.
+  64,846 tokens in and 20,154 out, $0.0087. On the 1995 benchmark game, each
+  Nemotron replay took about 30 s and $0.003 (14 calls, all usable), against
+  56.8 minutes for `gemma:7b` on a 4-core CPU. See
+  [BENCHMARKS.md](BENCHMARKS.md#the-replay-nemotron-on-the-same-evidence-twice).
 - **Rate limits:** none hit in 43 calls.
 - Onboarding: account, $1 trial credit, card requirement, time to the first
   successful call: _to be noted by Colin when he creates the key_.

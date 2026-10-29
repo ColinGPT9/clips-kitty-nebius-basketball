@@ -147,8 +147,9 @@ Colin should spot-check them by watching the clips.
 |---|---|
 | `gemma` (app run, job 1) | done, 2026-10-28: 6 clips in 88.8 min, below |
 | `gemma` (replay) | done, 2026-10-28: 7 clips, 14 calls, 56.8 min, below |
-| `nemotron` (replay) | not run: one game on Nebius, by choice ([the live run](#live-run-a-2026-nba-game-on-nemotron) used a different game) |
-| `gemma-nebius` (replay) | not run: one game on Nebius, by choice |
+| `nemotron` (replay) | done, 2026-10-28: 9 clips, 14 calls, 31 s, $0.0032, below |
+| `nemotron-2` (replay) | done, 2026-10-28: 9 clips, 14 calls, 36 s, $0.0034, below |
+| `gemma-nebius` (replay) | not run |
 
 ### The app run: Gemma, the whole job (job 1)
 
@@ -224,11 +225,90 @@ and the run has no per-token cost.
 - **Against the app run:** the same six plays were picked again, each with a
   time overlap of at least 0.78, plus one more (clip 7). The game-winner fell
   from first to sixth of seven, and every title was written differently. So a
-  single run of one model can't separate two models on ranking or titles. A
-  Nemotron replay on this game should be run twice for that reason.
+  single run of one model can't separate two models on ranking or titles. The
+  Nemotron replay below was run twice for that reason.
 - **Selection:** 2 of the 7 must-haves again (R6 and R13), and the same five are
   missed: R1, R2, R7, R9 and R14.
 - **Titles:** 1 right, 2 partly right, 4 wrong.
+
+### The replay: Nemotron on the same evidence, twice
+
+`llm_bench.py replay … --backend nebius/nvidia/Nemotron-3_5-Lightning`, with the
+labels `nemotron` and `nemotron-2`, on Colin's Windows PC. Nemotron is asked
+to answer without thinking (see [the live run](#first-attempt-thinking-on-and-the-job-failed)).
+The runs' files are [bench/nemotron.json](bench/nemotron.json) and
+[bench/nemotron-2.json](bench/nemotron-2.json).
+
+| Step | Calls | Usable JSON | Mean seconds per call (run 1 / run 2) |
+|---|---|---|---|
+| Chunk scoring | 6 | 6 | 2.0 / 2.1 |
+| Window scoring | 5 | 5 | 2.5 / 2.8 |
+| Rerank | 1 | 1 | 0.6 / 0.6 |
+| Titles | 2 | 2 | 2.4 / 4.1 |
+| **Total** | **14** | **14** | **30 s / 35 s of language-model time** |
+
+| Run | Tokens in / out | Reasoning tokens | Cost |
+|---|---|---|---|
+| `nemotron` | 26,429 / 6,664 | 0 | $0.0032 |
+| `nemotron-2` | 26,158 / 7,763 | 0 | $0.0034 |
+
+Cost is Nebius' reported tokens × its listed prices ($0.06 in, $0.24 out per
+million tokens, read from its public catalogue on 2026-10-28). No call failed,
+was retried or fell back to another response format.
+
+**Run 1 (`nemotron`)**
+
+| # | Window (s) | Score | Reference | Title and description | Title judged |
+|---|---|---|---|---|---|
+| 1 | 235.9–254.7 | 74 | R3, the no-call | "Downes wild shot trash referee call": "Downes wild shot called trash. Referee lets play go after Matt tries to take charge." | Partly. Right player and the no-call, but "trash" is the commentator's word for the ref's call, not the shot, and the travel is missed |
+| 2 | 290.8–307.4 | 59 | the last 4 s of R4. Mostly talk | "Anchor Chip Simple Planted Sweat": "Simple anchor chip technique demonstrated…" | Wrong. "Anchor chip" is Whisper mishearing the ref wiping the floor; the technique is made up |
+| 3 | 393.6–423.4 | 80 | **R6**, Christensen's rebound and Penn's steal | "Belmont careful stall offense turnover": "…turnover occurs with 305 seconds remaining…" | Partly. The turnover is right, but Penn's steal isn't named and 3:05 is misread as 305 seconds |
+| 4 | 767.3–808.5 | 70 | none: talk, then Kamah's free throw | "Kamah money free throw": "Kamah shoots free throw after controversial call." | Right |
+| 5 | 820.5–835.5 | 75 | R10, 58–57 and Penn's turnover | "Marauders lead 58-57 money time": "…Penn turnover no fouls." | Right |
+| 6 | 894.2–908.9 | 74 | the last 1 s of R11, then the timeout | "Salem ice Marauders timeout 59-58": "Salem uses timeout to ice Marauders. Score 59-58 Witches by one." | Right, but there is no play in the clip |
+| 7 | 1104.7–1146.8 | 75 | **R13, the game-winner** | "Kamah shot in bounds with one second": "Kamah scores in bounds with one second remaining." | Partly. Kamah scores, but about five seconds were left, not one, and it doesn't say the basket wins it for Salem |
+| 8 | 1205.0–1229.6 | 72 | **R14**, before the last inbound | "Marauders three seconds chance" | Right |
+| 9 | 1250.3–1279.8 | 86 | **R14**, the inbound, no shot, "Salem wins it", the court storm | "Marauders charge court Salem wins ball game" | Partly. Salem wins and Belmont gets no shot off, but the crowd storms the court, not the Marauders |
+
+**Run 2 (`nemotron-2`)**
+
+| # | Window (s) | Score | Reference | Title and description | Title judged |
+|---|---|---|---|---|---|
+| 1 | 235.9–254.7 | 64 | R3, the no-call | "Downes wild shot trash referee call": "…Referee let the play go, calling it trash." | Partly. The commentator calls it trash, not the referee |
+| 2 | 280.4–307.4 | 64 | R4, the Kleenex | "Ref uses Kleenex instead of towel": "Gym had no towels. Ref pulled out a Kleenex to clean the ball. Doug was told to keep eyes on Kamal's middle." | Partly. The title is right, but he wipes the floor, not the ball, and Kamal receives the pass |
+| 3 | 407.7–423.4 | 61 | **R6**, Penn's steal | "Stolen out of Conley's hands by Penn" | Right |
+| 4 | 767.3–808.5 | 71 | none: talk, then Kamah's free throw | "Kamal money free throw": "…Kamah made the money free throw…" | Right |
+| 5 | 820.5–835.5 | 76 | R10 | "Marauders by one closing in on minute": "Marauders led 58-57… Penn committed a turnover with no fouls called." | Right |
+| 6 | 885.0–908.9 | 71 | the end of R11, then the timeout | "Marauders needed timeout to regroup": "Marauders called timeout after Salem attempted to ice them." | Partly. 59–58 Witches is right, but Salem's timeout is given to the Marauders |
+| 7 | 1118.0–1145.5 | 80 | **R13, the game-winner** | "Kamah shake bakes in bounds shot": "…with one second remaining." | Partly. Right player and he scores, but not one second left, and it doesn't say it wins the game |
+| 8 | 1205.0–1229.6 | 73 | **R14**, before the last inbound | "Maurders have three seconds left" | Right, though "Marauders" is misspelt |
+| 9 | 1250.3–1279.8 | 90 | **R14**, the court storm | "Marauders charge the court Salem wins the ball game" | Partly. Salem wins, but the crowd storms the court, not the players |
+
+- **Selection:** both runs found 3 of the 7 must-haves: R6, R13 and **R14**, the
+  last three seconds and the court storm, which Gemma missed in both of its
+  runs. Both missed R1 (the putback), R2 (Mateo's three), R7 (the block and
+  steal) and R9 (Costello's strip), as Gemma did.
+- **Against each other:** the two runs picked the same nine plays, and five of
+  the windows are identical. Run 2 stretched clip 2 back to include the Kleenex
+  and wrote a right title for it.
+- **False positives:** run 1's clip 2 is mostly talk. In both runs clip 6 is the
+  timeout and clip 8 the talk before the last inbound: their titles are right,
+  but neither has a play in it.
+- **Ranking:** the court storm ranked first in both runs. The game-winner ranked
+  fourth of nine, then second.
+- **Titles:** run 1: 4 right, 4 partly right, 1 wrong. Run 2: 4 right, 5 partly
+  right, none wrong. Gemma's two runs had 2 of 6 and 1 of 7 right, with 4 wrong
+  each. Nemotron never put a player on the wrong team or gave the game to the
+  wrong side; its mistakes were details: the time left on the game-winner, who
+  called the timeout, who stormed the court.
+- **Speed and cost:** about 30 seconds of language-model time per replay, against
+  56.8 minutes for `gemma:7b` on the test machine's 4-core CPU, for about a third
+  of a cent. That compares a hosted model with a local one on a CPU with no GPU,
+  so it shows what a creator without a GPU gains, not which model is faster.
+
+The selection and title judgements were made by Claude, reading each clip's
+transcript against the reference list. A second, independent pass checked every
+verdict and changed one (run 2, clip 2, from Right to Partly).
 
 ## Live run: a 2026 NBA game on Nemotron
 

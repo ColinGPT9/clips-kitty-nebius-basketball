@@ -176,6 +176,8 @@ Python 3.11, CUDA):
   [BENCHMARKS.md](BENCHMARKS.md#live-run-a-2026-nba-game-on-nemotron).
 - **Offline:** `tests/test_nebius.py` (26 tests), and the tests the fix and the
   code-scanning changes touch, passed.
+- **The benchmark replays on Nemotron:** two replays of the 1995 game's saved
+  evidence, 14 calls each, all usable, about 30 s and $0.003 each. See
+  [BENCHMARKS.md](BENCHMARKS.md#the-replay-nemotron-on-the-same-evidence-twice).
 - **Not run:** option B (the desktop app's screens) on Nemotron, and the
-  Nemotron and Gemma-on-Nebius replays of the 1995 game. Colin ran one game on
-  Nebius, by choice.
+  Gemma-on-Nebius replay.

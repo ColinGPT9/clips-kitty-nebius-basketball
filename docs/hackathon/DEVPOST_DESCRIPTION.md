@@ -140,8 +140,11 @@ Measured on one 43-minute NBA broadcast, on an RTX 3060
 - **Titles still need the scoreboard.** The basketball title check found 37 of
   57 titles named the wrong play or scorer, and fixed them by rewriting or
   writing from the score bug. One wrong title still got through.
-- **The comparison with Gemma is still open.** The Gemma benchmark used a
-  different game, and the matching Nemotron replay wasn't run.
+- **On the same evidence as Gemma, Nemotron wrote better titles.** On the 1995
+  benchmark game, two Nemotron replays got 4 of 9 titles right and 4 or 5
+  partly right, against Gemma's 1 or 2 right and 4 wrong. Nemotron also found
+  the court storm Gemma missed. Both missed the same four early plays. Each
+  replay took about 30 s and cost about a third of a cent.
 
 ## What's next for Clips Kitty
 
