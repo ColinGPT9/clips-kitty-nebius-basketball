@@ -54,7 +54,7 @@ if (!process.versions.electron) {
     const delay = () => new Promise(resolve => setTimeout(resolve, 180))
     const input = 'input[aria-label="Twitch channel to collect from: fixturekitty"]'
     // A string literal for the page's code, with <, >, / and the JS line separators escaped as well.
-    const literal = value => JSON.stringify(value).replace(/[<>/  ]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'))
+    const literal = value => JSON.stringify(value).replace(/[<>/\u2028\u2029]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'))
     const click = text => js(`Array.from(document.querySelectorAll('button')).find(b=>b.textContent===${literal(text)}).click()`)
     const setInput = value => js(`(()=>{const i=document.querySelector(${literal(input)});Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(i,${literal(value)});i.dispatchEvent(new Event('input',{bubbles:true}))})()`)
     try {
